@@ -1,3 +1,5 @@
+import { NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
 import { isAdmin } from '@/lib/auth';
 
 export async function PUT(req: Request, { params }: { params: { id: string } }) {

@@ -16,7 +16,12 @@ export async function GET(request: Request) {
       const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as { userId: string; email: string };
 
       const user = await prisma.user.findUnique({
-        where: { id: decoded.userId }
+        where: { id: decoded.userId },
+        include: {
+          purchases: {
+            orderBy: { createdAt: 'desc' }
+          }
+        }
       });
 
       if (!user) {
@@ -24,7 +29,14 @@ export async function GET(request: Request) {
       }
 
       return NextResponse.json({
-        user: { id: user.id, name: user.name, email: user.email }
+        user: { 
+          id: user.id, 
+          name: user.name, 
+          email: user.email,
+          role: user.role,
+          createdAt: user.createdAt,
+          purchases: user.purchases
+        }
       });
     } catch (error) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });

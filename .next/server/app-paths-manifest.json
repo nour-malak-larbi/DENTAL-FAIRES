@@ -1,1 +1,10 @@
-{}
+{
+  "/webinaires/page": "app/webinaires/page.js",
+  "/webinaires/[id]/page": "app/webinaires/[id]/page.js",
+  "/mindshares/page": "app/mindshares/page.js",
+  "/api/mindshares/route": "app/api/mindshares/route.js",
+  "/login/page": "app/login/page.js",
+  "/api/webinars/route": "app/api/webinars/route.js",
+  "/api/webinars/[id]/route": "app/api/webinars/[id]/route.js",
+  "/page": "app/page.js"
+}

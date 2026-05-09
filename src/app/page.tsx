@@ -5,6 +5,18 @@ import Navbar from '@/components/Navbar';
 
 export default function Home() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [mindshares, setMindshares] = useState<any[]>([]);
+  const [loadingMindshares, setLoadingMindshares] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/mindshares')
+      .then(res => res.json())
+      .then(data => {
+        setMindshares(data.slice(0, 3));
+        setLoadingMindshares(false);
+      })
+      .catch(() => setLoadingMindshares(false));
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -639,26 +651,30 @@ document.addEventListener('mousemove', (e) => {
         <a href="/mindshares" className="btn-ghost" style={{"whiteSpace":"nowrap","alignSelf":"flex-end"}}>Tout voir</a>
       </div>
       <div className="ms-grid">
-        <a href="/mindshares/1" className="ms-card ms-feat reveal">
-          <p className="ms-cat">Cas Clinique</p>
-          <h3 className="ms-title">Gestion des complications implantaires : retour sur 3 cas complexes</h3>
-          <p className="ms-excerpt">Une analyse approfondie de trois situations délicates, les décisions prises et les leçons apprises pour améliorer nos protocoles quotidiens.</p>
-          <div className="ms-meta"><span>Dr. A. Benali</span> · 8 min · 23 Avr 2026</div>
-        </a>
-        <div style={{"display":"flex","flexDirection":"column","gap":"1px","background":"var(--border)"}}>
-          <a href="/mindshares/2" className="ms-card reveal reveal-d1">
-            <p className="ms-cat">Innovation</p>
-            <h3 className="ms-title">L'IA en dentisterie : où en sommes-nous vraiment ?</h3>
-            <p className="ms-excerpt">Tour d'horizon des outils qui transforment le diagnostic et la planification.</p>
-            <div className="ms-meta"><span>Dr. N. Larbi</span> · 5 min</div>
-          </a>
-          <a href="/mindshares/3" className="ms-card reveal reveal-d2">
-            <p className="ms-cat">Pratique Clinique</p>
-            <h3 className="ms-title">Gestion du stress en cabinet : stratégies concrètes</h3>
-            <p className="ms-excerpt">Des techniques validées pour améliorer la qualité de votre pratique.</p>
-            <div className="ms-meta"><span>Dr. S. Hamdi</span> · 6 min</div>
-          </a>
-        </div>
+        {loadingMindshares ? (
+          <div style={{ padding: '2rem', color: 'rgba(255,255,255,0.3)' }}>Chargement...</div>
+        ) : mindshares.length > 0 ? (
+          <>
+            <a href={`/mindshares/${mindshares[0].id}`} className="ms-card ms-feat reveal">
+              <p className="ms-cat">{mindshares[0].category}</p>
+              <h3 className="ms-title">{mindshares[0].title}</h3>
+              <p className="ms-excerpt">{mindshares[0].excerpt || mindshares[0].subtitle}</p>
+              <div className="ms-meta"><span>{mindshares[0].author}</span> · {mindshares[0].date}</div>
+            </a>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', background: 'var(--border)' }}>
+              {mindshares.slice(1, 3).map((ms, idx) => (
+                <a key={ms.id} href={`/mindshares/${ms.id}`} className={`ms-card reveal reveal-d${idx + 1}`}>
+                  <p className="ms-cat">{ms.category}</p>
+                  <h3 className="ms-title">{ms.title}</h3>
+                  <p className="ms-excerpt">{ms.excerpt || ms.subtitle}</p>
+                  <div className="ms-meta"><span>{ms.author}</span></div>
+                </a>
+              ))}
+            </div>
+          </>
+        ) : (
+          <div style={{ padding: '2rem', color: 'rgba(255,255,255,0.3)' }}>Aucun mindshare disponible.</div>
+        )}
       </div>
     </div>
   </section>

@@ -97,6 +97,7 @@ export default function AdminLoginPage() {
 
                 if (res.ok) {
                   localStorage.setItem('admin_user', JSON.stringify(data.user));
+                  localStorage.setItem('token', data.token);
                   router.push('/admin/dashboard');
                 } else {
                   alert(data.error || 'Accès refusé');

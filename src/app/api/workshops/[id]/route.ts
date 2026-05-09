@@ -59,7 +59,17 @@ export async function PUT(
         level: data.level,
         description: data.description,
         posterFile: data.posterFile,
-        meetLink: data.meetLink
+        meetLink: data.meetLink,
+        curriculum: {
+          deleteMany: {},
+          create: (data.curriculum || []).map((mod: any) => ({
+            title: mod.title,
+            description: mod.description || '',
+            duration: mod.duration,
+            meetLink: mod.meetLink,
+            order: mod.order
+          }))
+        }
       },
       include: {
         curriculum: {

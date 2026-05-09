@@ -1,8 +1,40 @@
 'use client';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
+  const router = useRouter();
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        router.push('/');
+      } else {
+        setError(data.error || 'Email ou mot de passe incorrect.');
+      }
+    } catch {
+      setError('Erreur de connexion. Veuillez réessayer.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     const field = document.getElementById('auth-dust-login');
     if (!field) return;
@@ -90,10 +122,22 @@ export default function LoginPage() {
           </div>
 
           <div className="auth-card">
-            <form onSubmit={(e) => e.preventDefault()}>
+            {error && (
+              <div style={{ background: 'rgba(200,50,50,0.1)', border: '1px solid rgba(200,50,50,0.3)', padding: '0.8rem 1rem', marginBottom: '1.4rem', borderRadius: '2px' }}>
+                <p style={{ color: '#ff6b6b', fontSize: '0.78rem', margin: 0, letterSpacing: '0.05em' }}>⚠ {error}</p>
+              </div>
+            )}
+            <form onSubmit={handleLogin}>
               <div className="form-group">
                 <label className="form-label">Email</label>
-                <input type="email" className="form-input" placeholder="contact@exemple.com" required />
+                <input
+                  type="email"
+                  className="form-input"
+                  placeholder="contact@exemple.com"
+                  required
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                />
               </div>
 
               <div className="form-group">
@@ -101,10 +145,19 @@ export default function LoginPage() {
                   <label className="form-label">Mot de passe</label>
                   <a href="#" className="form-forgot">Mot de passe oublié ?</a>
                 </div>
-                <input type="password" className="form-input" placeholder="••••••••" required />
+                <input
+                  type="password"
+                  className="form-input"
+                  placeholder="••••••••"
+                  required
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                />
               </div>
 
-              <button type="submit" className="btn-submit"><span>Connexion</span></button>
+              <button type="submit" className="btn-submit" disabled={loading}>
+                <span>{loading ? 'Connexion...' : 'Connexion'}</span>
+              </button>
             </form>
           </div>
 

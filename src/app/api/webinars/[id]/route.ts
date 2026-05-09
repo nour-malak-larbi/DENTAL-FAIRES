@@ -37,7 +37,8 @@ export async function PUT(
         speakerTitle: data.speakerTitle,
         description: data.description,
         posterFile: data.posterFile,
-        registrationUrl: data.registrationUrl
+        registrationUrl: data.registrationUrl,
+        meetLink: data.meetLink
       }
     });
     return NextResponse.json(webinar);

@@ -1,51 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-
-const OFFERS = [
-  {
-    id: 'essentiel',
-    label: 'Essentiel',
-    price: '490',
-    period: '/ mois',
-    highlight: false,
-    features: [
-      'Accès à tous les webinaires',
-      'Supports de cours PDF',
-      'Accès aux Mindshares Premium',
-      'Newsletter bimensuelle'
-    ]
-  },
-  {
-    id: 'elite',
-    label: 'Élite',
-    price: '890',
-    period: '/ mois',
-    highlight: true,
-    features: [
-      'Tout le forfait Essentiel',
-      'Accès prioritaire aux Workshops',
-      'Q&A mensuel avec les speakers',
-      'Coaching de groupe (1h/mois)',
-      'Certificats de formation'
-    ]
-  },
-  {
-    id: 'prestige',
-    label: 'Prestige',
-    price: '1 490',
-    period: '/ mois',
-    highlight: false,
-    features: [
-      'Tout le forfait Élite',
-      'Coaching individuel (1h/mois)',
-      'Audit de cabinet personnalisé',
-      'Accès VIP aux événements physiques',
-      'Ligne directe conciergerie'
-    ]
-  }
-];
-
 import Navbar from '@/components/Navbar';
 
 export default function VipPage() {
@@ -54,8 +9,79 @@ export default function VipPage() {
   const [purchaseStatus, setPurchaseStatus] = useState<string | null>(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedOffer, setSelectedOffer] = useState<any>(null);
+  const [offers, setOffers] = useState<any[]>([]);
+  const [settings, setSettings] = useState<any>({});
+  const [loading, setLoading] = useState(true);
+
+  const initialOffers = [
+    {
+      id: 'custom-1',
+      label: 'Accompagnement Personnalisé',
+      price: '1 290',
+      period: '/ mois',
+      highlight: false,
+      features: [
+        'Audit complet du cabinet',
+        'Séances de coaching privées',
+        'Suivi sur mesure',
+        'Accès à tous les webinaires'
+      ]
+    },
+    {
+      id: 'custom-2',
+      label: 'Développement de Compétences',
+      price: '790',
+      period: '/ mois',
+      highlight: true,
+      features: [
+        'Académie de formation en ligne',
+        'Sessions Mastermind collectives',
+        'Supports de cours PDF',
+        'Mindshares Premium'
+      ]
+    },
+    {
+      id: 'custom-3',
+      label: 'Optimisation de la Performance',
+      price: '990',
+      period: '/ mois',
+      highlight: false,
+      features: [
+        'Focus Leadership',
+        'Gestion d\'équipe',
+        'Rentabilité opérationnelle',
+        'Accès prioritaire aux workshops'
+      ]
+    }
+  ];
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [offersRes, settingsRes] = await Promise.all([
+          fetch('/api/vip-offers'),
+          fetch('/api/settings')
+        ]);
+        
+        if (offersRes.ok) {
+          const offersData = await offersRes.json();
+          setOffers(offersData.length > 0 ? offersData : initialOffers);
+        } else {
+          setOffers(initialOffers);
+        }
+
+        if (settingsRes.ok) {
+          setSettings(await settingsRes.json());
+        }
+      } catch (error) {
+        console.error('Fetch error:', error);
+        setOffers(initialOffers);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+
     const token = localStorage.getItem('token');
     if (token) {
       // Verify token
@@ -257,7 +283,7 @@ export default function VipPage() {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '3rem' }}>
-            {OFFERS.map(offer => (
+            {offers.map(offer => (
               <div key={offer.id} style={{
                 padding: '4.5rem 3.5rem',
                 background: offer.highlight ? 'rgba(196,153,58,0.03)' : 'rgba(255,255,255,0.01)',
@@ -426,8 +452,13 @@ export default function VipPage() {
               <p style={{ color: 'white', marginBottom: '1rem' }}>
                 Montant: <span style={{ color: '#C4993A', fontWeight: 'bold' }}>{selectedOffer?.price}€</span>
               </p>
-              <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', lineHeight: '1.5' }}>
-                Veuillez effectuer le paiement par virement bancaire ou autre moyen, puis télécharger votre reçu de paiement ci-dessous.
+              <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', lineHeight: '1.6', background: 'rgba(196,153,58,0.05)', padding: '1.5rem', border: '1px solid rgba(196,153,58,0.2)', marginBottom: '1.5rem' }}>
+                <p style={{ margin: '0 0 1rem', color: '#C4993A', fontWeight: 'bold' }}>COORDONNÉES BANCAIRES :</p>
+                <p style={{ margin: '0 0 0.5rem', fontFamily: 'monospace' }}>{settings.ccp || "CCP : 0025699879   CLÉ : 49"}</p>
+                <p style={{ margin: 0, fontFamily: 'monospace' }}>{settings.rip || "RIP : 00799999002569987949"}</p>
+              </div>
+              <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.85rem', lineHeight: '1.5' }}>
+                Veuillez effectuer le paiement puis télécharger votre reçu ci-dessous. 
                 L'équipe administrative validera votre accès sous 24h.
               </p>
             </div>

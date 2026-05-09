@@ -1,9 +1,52 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [role, setRole] = useState<'student' | 'formateur'>('student');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  
+  // Form fields
+  const [name, setName] = useState('');
+  const [prenom, setPrenom] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          name: `${prenom} ${name}`, 
+          email, 
+          password 
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        router.push('/');
+      } else {
+        setError(data.error || 'Erreur lors de l\'inscription.');
+      }
+    } catch (err) {
+      console.error(err);
+      setError('Erreur de connexion au serveur.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const field = document.getElementById('auth-dust');
@@ -179,6 +222,11 @@ export default function RegisterPage() {
           </div>
 
           <div className="auth-card">
+            {error && (
+              <div style={{ background: 'rgba(200,50,50,0.1)', border: '1px solid rgba(200,50,50,0.3)', padding: '0.8rem 1rem', marginBottom: '1.4rem', borderRadius: '2px' }}>
+                <p style={{ color: '#ff6b6b', fontSize: '0.78rem', margin: 0, letterSpacing: '0.05em' }}>⚠ {error}</p>
+              </div>
+            )}
             {/* Role tabs */}
             <div className="role-tabs">
               <button className={`role-tab${role === 'student' ? ' active' : ''}`} onClick={() => setRole('student')}>
@@ -189,26 +237,26 @@ export default function RegisterPage() {
               </button>
             </div>
 
-            <form onSubmit={(e) => e.preventDefault()}>
+            <form onSubmit={handleRegister}>
               <div className="form-row">
                 <div>
                   <label className="form-label">Nom</label>
-                  <input type="text" className="form-input" placeholder="Votre nom" required />
+                  <input type="text" className="form-input" placeholder="Votre nom" required value={name} onChange={e => setName(e.target.value)} />
                 </div>
                 <div>
                   <label className="form-label">Prénom</label>
-                  <input type="text" className="form-input" placeholder="Votre prénom" required />
+                  <input type="text" className="form-input" placeholder="Votre prénom" required value={prenom} onChange={e => setPrenom(e.target.value)} />
                 </div>
               </div>
 
               <div className="form-group">
                 <label className="form-label">Email</label>
-                <input type="email" className="form-input" placeholder="contact@exemple.com" required />
+                <input type="email" className="form-input" placeholder="contact@exemple.com" required value={email} onChange={e => setEmail(e.target.value)} />
               </div>
 
               <div className="form-group">
                 <label className="form-label">Mot de passe</label>
-                <input type="password" className="form-input" placeholder="••••••••" required />
+                <input type="password" className="form-input" placeholder="••••••••" required value={password} onChange={e => setPassword(e.target.value)} />
               </div>
 
               {/* Student fields */}
@@ -261,8 +309,8 @@ export default function RegisterPage() {
                 </div>
               )}
 
-              <button type="submit" className="btn-submit">
-                <span>Créer mon compte</span>
+              <button type="submit" className="btn-submit" disabled={loading}>
+                <span>{loading ? 'Création...' : 'Créer mon compte'}</span>
               </button>
             </form>
           </div>

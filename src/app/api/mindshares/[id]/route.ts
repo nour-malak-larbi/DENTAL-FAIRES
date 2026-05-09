@@ -40,7 +40,8 @@ export async function PUT(
         author: data.author,
         content: data.content,
         image: data.image,
-        excerpt: data.excerpt
+        excerpt: data.excerpt,
+        meetLink: data.meetLink
       }
     });
     return NextResponse.json(mindshare);

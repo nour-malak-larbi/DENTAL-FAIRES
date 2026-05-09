@@ -1,7 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { webinars, getPosterUrl } from '@/lib/webinairs-data';
 
 const ALL_CATEGORIES = [
   { value: 'all', label: 'Tous' },
@@ -68,7 +67,7 @@ export default function WebinairesPage() {
       <header style={{ padding: 'clamp(8.5rem, 16vw, 16rem) clamp(1rem, 4vw, 4.5rem) 6rem', textAlign: 'center', background: 'radial-gradient(circle at 50% 0%, rgba(196,153,58,0.1) 0%, transparent 70%)' }}>
         <p style={{ color: '#D4AF37', letterSpacing: '0.5em', fontSize: '0.65rem', marginBottom: '1.5rem', fontWeight: '600', textTransform: 'uppercase' }}>Formation Continue</p>
         <h1 style={{ 
-          fontSize: 'clamp(3.5rem, 7vw, 6.5rem)', 
+          fontSize: 'clamp(2.2rem, 8vw, 6.5rem)', 
           fontWeight: '200', 
           letterSpacing: '-0.02em', 
           margin: '0 0 2.5rem',
@@ -80,7 +79,7 @@ export default function WebinairesPage() {
         <div style={{ width: '60px', height: '1px', background: '#D4AF37', margin: '0 auto 4rem', opacity: 0.6 }}></div>
 
         {/* Categories Filter */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '3rem', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 'clamp(1rem, 4vw, 3rem)', flexWrap: 'wrap', padding: '0 1rem' }}>
           {ALL_CATEGORIES.map(cat => (
             <button
               key={cat.value}
@@ -101,7 +100,7 @@ export default function WebinairesPage() {
 
       {/* Grid Content */}
       <main style={{ padding: '0 clamp(1rem, 4vw, 4.5rem) 10rem', maxWidth: '1600px', margin: '0 auto' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'clamp(1.25rem, 2.8vw, 3.5rem)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 'clamp(1.5rem, 3vw, 3.5rem)' }}>
           {filteredWebinars.map((webinar) => (
             <Link 
               href={`/webinaires/${webinar.id}`} 
@@ -124,7 +123,7 @@ export default function WebinairesPage() {
                 {/* Poster Image Container - Ratio updated for "full" posters */}
                 <div style={{ position: 'relative', aspectRatio: '1/1', overflow: 'hidden', background: '#000' }}>
                   <img 
-                    src={getPosterUrl(webinar.posterFile)} 
+                    src={webinar.posterFile || webinar.image || '/logo-transparent.png'}
                     alt={webinar.title}
                     style={{
                       width: '100%', height: '100%', objectFit: 'cover',
@@ -193,9 +192,9 @@ export default function WebinairesPage() {
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
                       <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(196,153,58,0.1)', border: '1px solid rgba(196,153,58,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', color: '#D4AF37' }}>
-                        {webinar.speaker[0]}
+                        {(webinar.speaker || '?')[0]}
                       </div>
-                      <span style={{ fontSize: '0.75rem', color: 'rgba(245,242,236,0.7)', fontWeight: '300' }}>{webinar.speaker}</span>
+                      <span style={{ fontSize: '0.75rem', color: 'rgba(245,242,236,0.7)', fontWeight: '300' }}>{webinar.speaker || 'Intervenant'}</span>
                     </div>
                     
                     <div style={{ color: '#D4AF37', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>

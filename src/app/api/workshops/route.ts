@@ -41,8 +41,9 @@ export async function POST(request: Request) {
         curriculum: {
           create: data.curriculum?.map((module: any, index: number) => ({
             title: module.title,
-            description: module.description,
+            description: module.description || '',
             duration: module.duration,
+            meetLink: module.meetLink,
             order: index
           })) || []
         }

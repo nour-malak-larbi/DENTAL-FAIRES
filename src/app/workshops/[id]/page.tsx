@@ -123,32 +123,32 @@ export default function WorkshopDetailPage({ params }: { params: { id: string } 
     e.preventDefault();
     
     const formData = new FormData(e.target as HTMLFormElement);
-    const name = formData.get('name') + ' ' + formData.get('prenom');
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
     try {
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch('/api/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, email, password }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
         localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
         setIsConnected(true);
         setShowRegModal(false);
-        setPurchased(true);
+        if (workshop) {
+          setPurchased(true);
+        }
       } else {
-        alert(data.error || 'Registration failed');
+        alert(data.error || 'Email ou mot de passe incorrect.');
       }
     } catch (error) {
-      console.error('Registration error:', error);
-      alert('Registration failed');
+      console.error('Login error:', error);
+      alert('Erreur de connexion. Veuillez réessayer.');
     }
   };
 
@@ -176,7 +176,7 @@ export default function WorkshopDetailPage({ params }: { params: { id: string } 
                 background: '#0D140D', aspectRatio: '1/1'
               }}>
                 <img 
-                  src={getWorkshopPosterUrl(workshop.posterFile)} 
+                  src={workshop.posterFile ? getWorkshopPosterUrl(workshop.posterFile) : (workshop.image || '/logo-transparent.png')} 
                   alt={workshop.title}
                   onLoad={() => setImgLoaded(true)}
                   style={{ 
@@ -190,7 +190,7 @@ export default function WorkshopDetailPage({ params }: { params: { id: string } 
             {/* Right Side: Info */}
             <div style={{ flex: '1.2', minWidth: '320px' }}>
               <p style={{ color: '#C4993A', letterSpacing: '0.4em', fontSize: '0.75rem', marginBottom: '1.5rem', fontWeight: '600' }}>
-                {workshop.categoryLabel.toUpperCase()}
+                {(workshop.categoryLabel || workshop.category || '').toUpperCase()}
               </p>
               <h1 style={{ 
                 fontSize: '4.2rem', 
@@ -282,7 +282,7 @@ export default function WorkshopDetailPage({ params }: { params: { id: string } 
             <div>
               <h2 style={{ fontSize: '2.2rem', fontWeight: '200', marginBottom: '2.5rem', letterSpacing: '0.1em', fontFamily: 'var(--font-cormorant)' }}>À PROPOS DU WORKSHOP</h2>
               <div style={{ color: 'rgba(255,255,255,0.7)', lineHeight: '1.8', fontSize: '1.1rem', fontWeight: '300' }}>
-                {workshop.description.split('\n\n').map((para, i) => (
+                {(workshop.description || '').split('\n\n').map((para: string, i: number) => (
                   <p key={i} style={{ marginBottom: '1.5rem' }}>{para}</p>
                 ))}
               </div>
@@ -290,7 +290,7 @@ export default function WorkshopDetailPage({ params }: { params: { id: string } 
             <div>
               <h2 style={{ fontSize: '2.2rem', fontWeight: '200', marginBottom: '2.5rem', letterSpacing: '0.1em', fontFamily: 'var(--font-cormorant)' }}>OBJECTIFS PÉDAGOGIQUES</h2>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                {workshop.objectives.map((obj, i) => (
+                {(workshop.objectives || []).map((obj: string, i: number) => (
                   <li key={i} style={{ display: 'flex', gap: '1.2rem', marginBottom: '1.5rem', color: 'rgba(255,255,255,0.7)', fontSize: '1.05rem', lineHeight: '1.5' }}>
                     <span style={{ color: '#C4993A', fontWeight: 'bold' }}>0{i+1}</span>
                     <span>{obj}</span>
@@ -301,14 +301,15 @@ export default function WorkshopDetailPage({ params }: { params: { id: string } 
           </div>
 
           {/* Curriculum Section */}
+          {(workshop.curriculum?.length > 0 || workshop.sessions?.length > 0) && (
           <section id="curriculum" style={{ borderTop: '1px solid rgba(196,153,58,0.1)', paddingTop: '6rem' }}>
             <h2 style={{ fontSize: '2.5rem', fontWeight: '200', marginBottom: '4rem', letterSpacing: '0.1em', fontFamily: 'var(--font-cormorant)' }}>PROGRAMME DU WORKSHOP</h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: '2.5rem' }}>
-              {workshop.curriculum.map((module, idx) => (
+              {(workshop.curriculum || workshop.sessions || []).map((module: any, idx: number) => (
                 <div key={idx} style={{ background: '#0D140D', border: '1px solid rgba(255,255,255,0.05)', padding: '2.5rem', transition: 'all 0.3s' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
                     <span style={{ fontSize: '0.65rem', color: '#C4993A', letterSpacing: '0.2em', fontWeight: '600' }}>MODULE {idx + 1}</span>
-                    <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)' }}>{module.duration}</span>
+                    <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)' }}>{module.duration || module.date}</span>
                   </div>
                   <h4 style={{ fontSize: '1.2rem', fontWeight: '400', margin: '0 0 1.2rem', fontFamily: 'var(--font-cormorant)' }}>{module.title}</h4>
                   <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.5)', lineHeight: '1.6', marginBottom: '2rem', fontWeight: '300' }}>{module.description}</p>
@@ -324,40 +325,69 @@ export default function WorkshopDetailPage({ params }: { params: { id: string } 
               ))}
             </div>
           </section>
+          )}
         </div>
       </main>
 
-      {/* Registration Modal */}
+      {/* Login Modal - Style matching /login page */}
       {showRegModal && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.95)', backdropFilter: 'blur(15px)' }}>
-          <div style={{ background: '#0D140D', border: '1px solid #C4993A', padding: 'clamp(1.4rem, 4vw, 2.2rem)', width: '95%', maxWidth: '430px', position: 'relative' }}>
-            <button onClick={() => setShowRegModal(false)} style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'none', border: 'none', color: 'white', fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
-            <h2 style={{ fontFamily: "var(--font-cormorant)", fontSize: 'clamp(1.6rem, 4vw, 2.1rem)', color: '#C4993A', marginBottom: '0.9rem', textAlign: 'center' }}>Rejoindre l'Académie</h2>
-            <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.8rem', marginBottom: '1.7rem', textAlign: 'center' }}>Inscrivez-vous pour accéder à nos workshops certifiants.</p>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.92)', backdropFilter: 'blur(20px)' }}>
+          <div style={{
+            background: 'rgba(8,14,8,0.95)',
+            border: '1px solid rgba(196,153,58,0.18)',
+            padding: '2.8rem',
+            width: '95%', maxWidth: '420px',
+            position: 'relative',
+            borderRadius: '4px',
+            boxShadow: '0 32px 80px rgba(0,0,0,0.7)'
+          }}>
+            {/* Gold line top */}
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1px', background: 'linear-gradient(90deg,transparent,rgba(196,153,58,0.5),transparent)' }} />
             
+            <button onClick={() => setShowRegModal(false)} style={{ position: 'absolute', top: '1.2rem', right: '1.2rem', background: 'none', border: 'none', color: 'rgba(245,242,236,0.4)', fontSize: '1.3rem', cursor: 'pointer', lineHeight: 1 }}>×</button>
+            
+            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+              <img src="/logo-transparent.png" alt="Dental Fairies" style={{ height: '160px', width: 'auto', display: 'block', margin: '-40px auto -50px', filter: 'drop-shadow(0 0 16px rgba(196,153,58,0.5))' }} />
+              <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '2.2rem', fontWeight: '200', color: '#F5F2EC', margin: '0 0 0.4rem' }}>Accès à l&apos;<em style={{ fontStyle: 'italic', color: '#E2C47A' }}>académie</em></h2>
+              <p style={{ fontSize: '0.75rem', letterSpacing: '0.12em', color: 'rgba(245,242,236,0.4)', margin: 0 }}>Connectez-vous pour accéder au contenu.</p>
+            </div>
+
             <form onSubmit={handleRegister}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.2rem', marginBottom: '1.5rem' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.65rem', color: '#C4993A', letterSpacing: '0.15em', marginBottom: '0.6rem' }}>NOM</label>
-                  <input name="name" type="text" required style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(196,153,58,0.3)', padding: '1rem', color: 'white', outline: 'none' }} />
+              <div style={{ marginBottom: '1.2rem' }}>
+                <label style={{ display: 'block', fontSize: '0.6rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#C4993A', marginBottom: '0.5rem' }}>Email</label>
+                <input name="email" type="email" placeholder="contact@exemple.com" required
+                  style={{ width: '100%', background: 'rgba(4,8,4,0.8)', border: '1px solid rgba(26,46,26,0.8)', padding: '0.85rem 1rem', color: '#F5F2EC', fontFamily: "'Jost', sans-serif", fontSize: '0.82rem', fontWeight: '200', outline: 'none', borderRadius: 0, boxSizing: 'border-box' }}
+                  onFocus={e => e.currentTarget.style.borderColor = 'rgba(196,153,58,0.55)'}
+                  onBlur={e => e.currentTarget.style.borderColor = 'rgba(26,46,26,0.8)'}
+                />
+              </div>
+
+              <div style={{ marginBottom: '1.6rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <label style={{ fontSize: '0.6rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#C4993A' }}>Mot de passe</label>
+                  <a href="#" style={{ fontSize: '0.6rem', letterSpacing: '0.1em', color: 'rgba(245,242,236,0.3)', textDecoration: 'none' }}>Mot de passe oublié ?</a>
                 </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.65rem', color: '#C4993A', letterSpacing: '0.15em', marginBottom: '0.6rem' }}>PRÉNOM</label>
-                  <input name="prenom" type="text" required style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(196,153,58,0.3)', padding: '1rem', color: 'white', outline: 'none' }} />
-                </div>
+                <input name="password" type="password" placeholder="••••••••" required
+                  style={{ width: '100%', background: 'rgba(4,8,4,0.8)', border: '1px solid rgba(26,46,26,0.8)', padding: '0.85rem 1rem', color: '#F5F2EC', fontFamily: "'Jost', sans-serif", fontSize: '0.82rem', fontWeight: '200', outline: 'none', borderRadius: 0, boxSizing: 'border-box' }}
+                  onFocus={e => e.currentTarget.style.borderColor = 'rgba(196,153,58,0.55)'}
+                  onBlur={e => e.currentTarget.style.borderColor = 'rgba(26,46,26,0.8)'}
+                />
               </div>
-              <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{ display: 'block', fontSize: '0.65rem', color: '#C4993A', letterSpacing: '0.15em', marginBottom: '0.6rem' }}>EMAIL PROFESSIONNEL</label>
-                <input name="email" type="email" required style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(196,153,58,0.3)', padding: '1rem', color: 'white', outline: 'none' }} />
-              </div>
-              <div style={{ marginBottom: '1.8rem' }}>
-                <label style={{ display: 'block', fontSize: '0.65rem', color: '#C4993A', letterSpacing: '0.15em', marginBottom: '0.6rem' }}>MOT DE PASSE</label>
-                <input name="password" type="password" required style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(196,153,58,0.3)', padding: '1rem', color: 'white', outline: 'none' }} />
-              </div>
-              <button type="submit" style={{ width: '100%', padding: '1rem', background: '#C4993A', color: 'white', border: 'none', cursor: 'pointer', fontWeight: 'bold', letterSpacing: '0.2em', fontSize: '0.78rem' }}>
-                S'INSCRIRE ET CONTINUER
-              </button>
+
+              <button type="submit" style={{
+                width: '100%', padding: '1rem',
+                background: 'linear-gradient(135deg,#C4993A,#8B6820)',
+                color: '#080E08', border: 'none', cursor: 'pointer',
+                fontFamily: "'Jost', sans-serif", fontSize: '0.7rem', fontWeight: '400',
+                letterSpacing: '0.22em', textTransform: 'uppercase',
+                clipPath: 'polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))'
+              }}>Connexion</button>
             </form>
+
+            <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.78rem', color: 'rgba(245,242,236,0.35)' }}>
+              Nouveau membre ?{' '}
+              <a href="/register" style={{ color: '#C4993A', textDecoration: 'none' }}>Rejoindre l&apos;académie</a>
+            </p>
           </div>
         </div>
       )}

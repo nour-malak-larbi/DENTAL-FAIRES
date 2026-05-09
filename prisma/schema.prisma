@@ -32,6 +32,7 @@ model Webinar {
   posterFile      String?
   registrationUrl String?
   meetLink        String?
+  tags            String[]
   createdAt       DateTime @default(now())
 }
 
@@ -50,6 +51,7 @@ model Workshop {
   description     String
   posterFile      String?
   meetLink        String?
+  tags            String[]
   curriculum      WorkshopModule[]
   createdAt       DateTime @default(now())
 }
@@ -61,6 +63,7 @@ model WorkshopModule {
   title       String
   description String
   duration    String
+  meetLink    String?
   order       Int
   createdAt   DateTime @default(now())
 }
@@ -75,6 +78,18 @@ model Mindshare {
   image       String?
   excerpt     String?
   meetLink    String?
+  tags        String[]
+  createdAt   DateTime @default(now())
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  price       String
+  description String
+  image       String?
+  category    String?
+  tags        String[]
   createdAt   DateTime @default(now())
 }
 
@@ -82,7 +97,7 @@ model Purchase {
   id            String   @id @default(cuid())
   userId        String
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  productType   String   // 'workshop', 'webinar', 'mindshare', 'vip'
+  productType   String   // 'workshop', 'webinar', 'mindshare', 'vip', 'product'
   productId     String
   amount        String
   status        String   @default("pending") // 'pending', 'paid', 'rejected'
@@ -100,4 +115,33 @@ model UserProgress {
   completed  Boolean  @default(false)
   completedAt DateTime?
   createdAt  DateTime @default(now())
+}
+
+model VipOffer {
+  id        String   @id @default(cuid())
+  label     String
+  price     String
+  period    String   @default("/ mois")
+  highlight Boolean  @default(false)
+  features  String[] 
+  order     Int      @default(0)
+  sessions  VipSession[]
+  createdAt DateTime @default(now())
+}
+
+model VipSession {
+  id        String   @id @default(cuid())
+  vipId     String
+  vipOffer  VipOffer @relation(fields: [vipId], references: [id], onDelete: Cascade)
+  title     String
+  date      String?
+  meetLink  String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model GlobalSetting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
 }

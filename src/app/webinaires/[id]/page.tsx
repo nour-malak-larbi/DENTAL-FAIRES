@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { webinars, getWebinarById, getPosterUrl } from '@/lib/webinairs-data';
 
 import Navbar from '@/components/Navbar';
 
@@ -142,7 +141,7 @@ export default function WebinarDetailPage({ params }: { params: { id: string } }
               background: '#000', aspectRatio: '16/9'
             }}>
               <img 
-                src={getPosterUrl(webinar.posterFile)} 
+                src={webinar.posterFile || webinar.image || '/logo-transparent.png'}
                 alt={webinar.title}
                 onLoad={() => setImgLoaded(true)}
                 style={{ 
@@ -159,7 +158,7 @@ export default function WebinarDetailPage({ params }: { params: { id: string } }
           {/* Right Side: Info */}
           <div style={{ flex: '1.2', minWidth: '320px' }}>
             <div style={{ display: 'flex', gap: '0.6rem', marginBottom: '1.5rem' }}>
-              {webinar.tags.map(tag => (
+              {(webinar.tags || []).map((tag: string) => (
                 <span key={tag} style={{ fontSize: '0.6rem', color: '#F1D382', border: '1px solid rgba(212,175,55,0.3)', padding: '0.3rem 0.8rem', borderRadius: '20px', textTransform: 'uppercase' }}>
                   #{tag}
                 </span>

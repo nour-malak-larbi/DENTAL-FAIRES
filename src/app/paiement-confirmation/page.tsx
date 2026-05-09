@@ -67,7 +67,7 @@ export default function PaymentConfirmationPage() {
 
   return (
     <main style={{ 
-      backgroundColor: '#080E08', 
+      backgroundColor: '#091209', 
       minHeight: '100vh', 
       color: 'white', 
       fontFamily: "'Jost', sans-serif",

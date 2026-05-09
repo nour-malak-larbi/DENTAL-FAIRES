@@ -10,6 +10,14 @@ const UPCOMING = [
 
 export default function PodcastsPage() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const navLinkStyle: React.CSSProperties = {
+    color: 'rgba(245,242,236,0.6)',
+    textDecoration: 'none',
+    fontSize: '0.68rem',
+    letterSpacing: '0.16em',
+    textTransform: 'uppercase',
+    fontWeight: 500
+  };
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -18,11 +26,11 @@ export default function PodcastsPage() {
   }, []);
 
   return (
-    <div style={{ backgroundColor: '#0A0F0A', minHeight: '100vh', color: 'white', fontFamily: "var(--font-inter), sans-serif" }}>
+    <div style={{ backgroundColor: '#091209', minHeight: '100vh', color: 'white', fontFamily: "'Jost', sans-serif" }}>
       {/* Navigation */}
       <nav style={{
         position: 'fixed', top: 0, width: '100%', zIndex: 1000,
-        padding: isScrolled ? '0.5rem 4.5rem' : '1rem 4.5rem',
+        padding: isScrolled ? '0.55rem clamp(1rem, 4vw, 4.5rem)' : '0.9rem clamp(1rem, 4vw, 4.5rem)',
         backgroundColor: isScrolled ? 'rgba(10, 15, 10, 0.95)' : 'transparent',
         backdropFilter: isScrolled ? 'blur(12px)' : 'none',
         transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -35,28 +43,41 @@ export default function PodcastsPage() {
               src="/logo-transparent.png" 
               alt="Dental Fairies" 
               style={{ 
-                height: isScrolled ? '120px' : '180px', 
+                height: isScrolled ? '108px' : '145px', 
                 width: 'auto', 
-                margin: isScrolled ? '-40px 0' : '-65px 0',
+                margin: isScrolled ? '-28px 0' : '-38px 0',
                 filter: 'drop-shadow(0 0 20px rgba(196,153,58,0.4))',
                 transition: 'all 0.5s ease'
               }} 
             />
           </div>
         </Link>
-        <ul style={{ display: 'flex', gap: '2rem', listStyle: 'none', alignItems: 'center', margin: 0, padding: 0 }}>
-          <li><Link href="/" style={{ color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: '0.65rem', letterSpacing: '0.15em', fontWeight: '500' }}>ACCUEIL</Link></li>
-          <li><Link href="/webinaires" style={{ color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: '0.65rem', letterSpacing: '0.15em', fontWeight: '500' }}>WEBINAIRES</Link></li>
-          <li><Link href="/mindshares" style={{ color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: '0.65rem', letterSpacing: '0.15em', fontWeight: '500' }}>MINDSHARES</Link></li>
-          <li><Link href="/workshops" style={{ color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: '0.65rem', letterSpacing: '0.15em', fontWeight: '500' }}>WORKSHOPS</Link></li>
-          <li><Link href="/podcasts" style={{ color: '#C4993A', textDecoration: 'none', fontSize: '0.65rem', letterSpacing: '0.15em', fontWeight: '600' }}>PODCASTS</Link></li>
-          <li><Link href="/vip" style={{ color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: '0.65rem', letterSpacing: '0.15em', fontWeight: '500' }}>COACHING VIP</Link></li>
-          <li><Link href="/boutique" style={{ color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: '0.65rem', letterSpacing: '0.15em', fontWeight: '500' }}>BOUTIQUE</Link></li>
+        <ul style={{ display: 'flex', gap: 'clamp(0.8rem, 2vw, 2rem)', listStyle: 'none', alignItems: 'center', margin: 0, padding: 0, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+          <li><Link href="/" style={navLinkStyle}>ACCUEIL</Link></li>
+          <li><Link href="/webinaires" style={navLinkStyle}>WEBINAIRES</Link></li>
+          <li><Link href="/mindshares" style={navLinkStyle}>MINDSHARES</Link></li>
+          <li><Link href="/workshops" style={navLinkStyle}>WORKSHOPS</Link></li>
+          <li><Link href="/podcasts" style={{ ...navLinkStyle, color: '#F1D382', fontWeight: 600 }}>PODCASTS</Link></li>
+          <li><Link href="/vip" style={navLinkStyle}>COACHING VIP</Link></li>
+          <li><Link href="/boutique" style={navLinkStyle}>BOUTIQUE</Link></li>
+          <li>
+            <Link href="/login" style={{
+              padding: '0.55rem 1.7rem',
+              border: '1px solid rgba(196,153,58,0.45)',
+              color: '#F1D382',
+              textDecoration: 'none',
+              fontSize: '0.68rem',
+              letterSpacing: '0.16em',
+              textTransform: 'uppercase',
+              fontWeight: 500,
+              background: 'transparent'
+            }}>CONNEXION</Link>
+          </li>
         </ul>
       </nav>
 
       {/* Hero Section */}
-      <section style={{ padding: '14rem 4.5rem 6rem', textAlign: 'center', background: 'radial-gradient(circle at 50% 0%, rgba(196,153,58,0.1) 0%, transparent 70%)' }}>
+      <section style={{ padding: 'clamp(8.5rem, 16vw, 14rem) clamp(1rem, 4vw, 4.5rem) 6rem', textAlign: 'center', background: 'radial-gradient(circle at 50% 0%, rgba(196,153,58,0.1) 0%, transparent 70%)' }}>
         <p style={{ color: '#C4993A', letterSpacing: '0.5em', fontSize: '0.75rem', marginBottom: '1.5rem', fontWeight: '600' }}>ÉCOUTEZ L'EXCELLENCE</p>
         <h1 style={{ 
           fontSize: 'clamp(3.5rem, 8vw, 7rem)', 
@@ -86,7 +107,7 @@ export default function PodcastsPage() {
       </section>
 
       {/* Upcoming Episodes */}
-      <section style={{ padding: '6rem 4.5rem 12rem' }}>
+      <section style={{ padding: '6rem clamp(1rem, 4vw, 4.5rem) 12rem' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <h2 style={{ 
             fontSize: '2.5rem', 
@@ -97,10 +118,10 @@ export default function PodcastsPage() {
             fontFamily: "'Cormorant Garamond', serif"
           }}>PROCHAINS ÉPISODES</h2>
           
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '3rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'clamp(1.25rem, 2.8vw, 3rem)' }}>
             {UPCOMING.map(episode => (
               <div key={episode.id} style={{ 
-                padding: '3rem', 
+                padding: 'clamp(1.1rem, 3vw, 3rem)', 
                 background: '#0D140D', 
                 border: '1px solid rgba(196,153,58,0.1)', 
                 position: 'relative',
@@ -151,7 +172,7 @@ export default function PodcastsPage() {
         </div>
       </section>
 
-      <footer style={{ padding: '6rem 4.5rem', borderTop: '1px solid rgba(196,153,58,0.1)', textAlign: 'center', background: 'rgba(0,0,0,0.2)' }}>
+      <footer style={{ padding: '6rem clamp(1rem, 4vw, 4.5rem)', borderTop: '1px solid rgba(196,153,58,0.1)', textAlign: 'center', background: 'rgba(0,0,0,0.2)' }}>
         <img src="/logo-transparent.png" alt="Footer Logo" style={{ height: '100px', width: 'auto', marginBottom: '2rem', opacity: 0.4, filter: 'grayscale(1)' }} />
         <p style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.25)', letterSpacing: '0.3em', fontWeight: '400' }}>
           DENTAL · FAIRIES · ACADEMY
@@ -160,6 +181,26 @@ export default function PodcastsPage() {
           © 2026 L'EXCELLENCE DENTAIRE RÉINVENTÉE
         </p>
       </footer>
+      <style>{`
+        @media (max-width: 1100px) {
+          nav ul li a {
+            font-size: 0.62rem !important;
+            letter-spacing: 0.12em !important;
+          }
+        }
+
+        @media (max-width: 900px) {
+          nav {
+            align-items: flex-start !important;
+            gap: 0.6rem;
+          }
+          nav ul {
+            width: 100%;
+            justify-content: flex-start !important;
+            row-gap: 0.55rem;
+          }
+        }
+      `}</style>
     </div>
   );
 }

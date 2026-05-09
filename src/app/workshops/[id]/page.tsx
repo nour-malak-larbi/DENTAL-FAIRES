@@ -37,14 +37,14 @@ export default function WorkshopDetailPage({ params }: { params: { id: string } 
 
   if (!workshop) {
     return (
-      <div style={{ backgroundColor: '#0A0F0A', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontFamily: 'var(--font-inter), sans-serif' }}>
+      <div style={{ backgroundColor: '#091209', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontFamily: 'var(--font-inter), sans-serif' }}>
         <p>Workshop non trouvé (ID: {params.id})</p>
       </div>
     );
   }
 
   return (
-    <div style={{ backgroundColor: '#0A0F0A', minHeight: '100vh', color: 'white', fontFamily: "var(--font-inter), sans-serif" }}>
+    <div style={{ backgroundColor: '#091209', minHeight: '100vh', color: 'white', fontFamily: "'Jost', sans-serif" }}>
       {/* Navigation */}
       <nav style={{
         position: 'fixed', top: 0, width: '100%', zIndex: 1000,
@@ -220,10 +220,10 @@ export default function WorkshopDetailPage({ params }: { params: { id: string } 
       {/* Registration Modal */}
       {showRegModal && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.95)', backdropFilter: 'blur(15px)' }}>
-          <div style={{ background: '#0D140D', border: '1px solid #C4993A', padding: '4rem', width: '95%', maxWidth: '480px', position: 'relative' }}>
+          <div style={{ background: '#0D140D', border: '1px solid #C4993A', padding: 'clamp(1.4rem, 4vw, 2.2rem)', width: '95%', maxWidth: '430px', position: 'relative' }}>
             <button onClick={() => setShowRegModal(false)} style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'none', border: 'none', color: 'white', fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
-            <h2 style={{ fontFamily: "var(--font-cormorant)", fontSize: '2.5rem', color: '#C4993A', marginBottom: '1rem', textAlign: 'center' }}>Rejoindre l'Académie</h2>
-            <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.9rem', marginBottom: '3rem', textAlign: 'center' }}>Inscrivez-vous pour accéder à nos workshops certifiants.</p>
+            <h2 style={{ fontFamily: "var(--font-cormorant)", fontSize: 'clamp(1.6rem, 4vw, 2.1rem)', color: '#C4993A', marginBottom: '0.9rem', textAlign: 'center' }}>Rejoindre l'Académie</h2>
+            <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.8rem', marginBottom: '1.7rem', textAlign: 'center' }}>Inscrivez-vous pour accéder à nos workshops certifiants.</p>
             
             <form onSubmit={handleRegister}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.2rem', marginBottom: '1.5rem' }}>
@@ -240,11 +240,11 @@ export default function WorkshopDetailPage({ params }: { params: { id: string } 
                 <label style={{ display: 'block', fontSize: '0.65rem', color: '#C4993A', letterSpacing: '0.15em', marginBottom: '0.6rem' }}>EMAIL PROFESSIONNEL</label>
                 <input type="email" required style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(196,153,58,0.3)', padding: '1rem', color: 'white', outline: 'none' }} />
               </div>
-              <div style={{ marginBottom: '3rem' }}>
+              <div style={{ marginBottom: '1.8rem' }}>
                 <label style={{ display: 'block', fontSize: '0.65rem', color: '#C4993A', letterSpacing: '0.15em', marginBottom: '0.6rem' }}>MOT DE PASSE</label>
                 <input type="password" required style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(196,153,58,0.3)', padding: '1rem', color: 'white', outline: 'none' }} />
               </div>
-              <button type="submit" style={{ width: '100%', padding: '1.2rem', background: '#C4993A', color: 'white', border: 'none', cursor: 'pointer', fontWeight: 'bold', letterSpacing: '0.2em', fontSize: '0.9rem' }}>
+              <button type="submit" style={{ width: '100%', padding: '1rem', background: '#C4993A', color: 'white', border: 'none', cursor: 'pointer', fontWeight: 'bold', letterSpacing: '0.2em', fontSize: '0.78rem' }}>
                 S'INSCRIRE ET CONTINUER
               </button>
             </form>
@@ -255,35 +255,35 @@ export default function WorkshopDetailPage({ params }: { params: { id: string } 
       {/* Payment Modal */}
       {isConnected && purchased && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.92)', backdropFilter: 'blur(15px)' }}>
-          <div style={{ background: '#0D140D', border: '1px solid #C4993A', padding: '4rem', width: '95%', maxWidth: '580px', position: 'relative' }}>
+          <div style={{ background: '#0D140D', border: '1px solid #C4993A', padding: 'clamp(1.4rem, 4vw, 2.2rem)', width: '95%', maxWidth: '500px', position: 'relative' }}>
             <button onClick={() => setPurchased(false)} style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'none', border: 'none', color: 'white', fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
             
-            <h2 style={{ fontFamily: "var(--font-cormorant)", fontSize: '2.8rem', color: '#C4993A', marginBottom: '1.5rem', textAlign: 'center' }}>Paiement du Workshop</h2>
-            <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '1rem', marginBottom: '3rem', textAlign: 'center', lineHeight: '1.6', fontWeight: '300' }}>
+            <h2 style={{ fontFamily: "var(--font-cormorant)", fontSize: 'clamp(1.7rem, 4vw, 2.2rem)', color: '#C4993A', marginBottom: '1rem', textAlign: 'center' }}>Paiement du Workshop</h2>
+            <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.88rem', marginBottom: '1.8rem', textAlign: 'center', lineHeight: '1.6', fontWeight: '300' }}>
               Pour finaliser votre inscription, veuillez effectuer le virement aux coordonnées ci-dessous et télécharger votre reçu.
             </p>
 
-            <div style={{ background: 'rgba(196,153,58,0.05)', padding: '2rem', border: '1px solid rgba(196,153,58,0.15)', marginBottom: '3rem' }}>
+            <div style={{ background: 'rgba(196,153,58,0.05)', padding: '1.2rem', border: '1px solid rgba(196,153,58,0.15)', marginBottom: '1.8rem' }}>
               <div style={{ marginBottom: '1.5rem' }}>
                 <p style={{ fontSize: '0.65rem', color: '#C4993A', letterSpacing: '0.2em', margin: '0 0 0.5rem', fontWeight: '600' }}>RIB PLATFORME</p>
-                <p style={{ margin: 0, fontSize: '1.1rem', color: 'white', letterSpacing: '0.05em' }}>007 99999 0000123456 78</p>
+                <p style={{ margin: 0, fontSize: '0.95rem', color: 'white', letterSpacing: '0.05em' }}>007 99999 0000123456 78</p>
               </div>
               <div>
                 <p style={{ fontSize: '0.65rem', color: '#C4993A', letterSpacing: '0.2em', margin: '0 0 0.5rem', fontWeight: '600' }}>CCP PLATFORME</p>
-                <p style={{ margin: 0, fontSize: '1.1rem', color: 'white', letterSpacing: '0.05em' }}>12345678 / 90</p>
+                <p style={{ margin: 0, fontSize: '0.95rem', color: 'white', letterSpacing: '0.05em' }}>12345678 / 90</p>
               </div>
             </div>
 
             <form onSubmit={(e) => { e.preventDefault(); alert('Reçu envoyé ! Notre équipe validera votre accès sous 24h.'); setPurchased(false); }}>
-              <div style={{ marginBottom: '2rem' }}>
+              <div style={{ marginBottom: '1.2rem' }}>
                 <label style={{ display: 'block', fontSize: '0.7rem', color: '#C4993A', letterSpacing: '0.1em', marginBottom: '0.6rem', fontWeight: '600' }}>CONFIRMER VOTRE EMAIL</label>
-                <input type="email" placeholder="votre@email.com" required style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(196,153,58,0.3)', padding: '1rem', color: 'white', outline: 'none' }} />
+                <input type="email" placeholder="votre@email.com" required style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(196,153,58,0.3)', padding: '0.8rem 0.9rem', color: 'white', outline: 'none' }} />
               </div>
-              <div style={{ marginBottom: '3rem' }}>
+              <div style={{ marginBottom: '1.8rem' }}>
                 <label style={{ display: 'block', fontSize: '0.7rem', color: '#C4993A', letterSpacing: '0.1em', marginBottom: '0.6rem', fontWeight: '600' }}>TÉLÉCHARGER LE REÇU (PDF/IMAGE)</label>
                 <input type="file" required style={{ width: '100%', color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem' }} />
               </div>
-              <button type="submit" style={{ width: '100%', padding: '1.2rem', background: '#C4993A', color: 'white', border: 'none', cursor: 'pointer', fontWeight: 'bold', letterSpacing: '0.2em', fontSize: '0.9rem' }}>
+              <button type="submit" style={{ width: '100%', padding: '1rem', background: '#C4993A', color: 'white', border: 'none', cursor: 'pointer', fontWeight: 'bold', letterSpacing: '0.18em', fontSize: '0.78rem' }}>
                 CONFIRMER MON PAIEMENT
               </button>
             </form>

@@ -15,6 +15,14 @@ export default function WebinairesPage() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeCategory, setActiveCategory] = useState('all');
   const [hoveredId, setHoveredId] = useState<number | null>(null);
+  const navLinkStyle: React.CSSProperties = {
+    color: 'rgba(245,242,236,0.6)',
+    textDecoration: 'none',
+    fontSize: '0.68rem',
+    letterSpacing: '0.16em',
+    textTransform: 'uppercase',
+    fontWeight: 500
+  };
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -39,7 +47,7 @@ export default function WebinairesPage() {
       <nav style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: isScrolled ? '0.5rem 4.5rem' : '0.8rem 4.5rem',
+        padding: isScrolled ? '0.55rem clamp(1rem, 4vw, 4.5rem)' : '0.9rem clamp(1rem, 4vw, 4.5rem)',
         backgroundColor: isScrolled ? '#091209' : 'transparent',
         borderBottom: isScrolled ? '1px solid rgba(212,175,55,0.2)' : 'none',
         transition: 'all 0.6s cubic-bezier(0.25, 0.1, 0.25, 1)',
@@ -51,9 +59,9 @@ export default function WebinairesPage() {
               src="/logo-transparent.png" 
               alt="Dental Fairies" 
               style={{ 
-                height: isScrolled ? '120px' : '200px', 
+                height: isScrolled ? '108px' : '145px', 
                 width: 'auto', 
-                margin: isScrolled ? '-40px 0' : '-65px 0',
+                margin: isScrolled ? '-28px 0' : '-38px 0',
                 filter: 'drop-shadow(0 0 16px rgba(196,153,58,0.55))',
                 transition: 'all 0.6s ease',
                 display: 'block'
@@ -62,14 +70,14 @@ export default function WebinairesPage() {
           </Link>
         </div>
 
-        <ul style={{ display: 'flex', gap: '1.8rem', listStyle: 'none', alignItems: 'center', margin: 0, padding: 0 }}>
-          <li><Link href="/" style={{ color: 'rgba(245,242,236,0.55)', textDecoration: 'none', fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase', transition: 'color 0.3s' }}>Accueil</Link></li>
-          <li><Link href="/webinaires" style={{ color: '#F1D382', textDecoration: 'none', fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: '400' }}>Webinaires</Link></li>
-          <li><Link href="/mindshares" style={{ color: 'rgba(245,242,236,0.55)', textDecoration: 'none', fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase' }}>Mindshares</Link></li>
-          <li><Link href="/workshops" style={{ color: 'rgba(245,242,236,0.55)', textDecoration: 'none', fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase' }}>Workshops</Link></li>
-          <li><Link href="/podcasts" style={{ color: 'rgba(245,242,236,0.55)', textDecoration: 'none', fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase' }}>Podcasts</Link></li>
-          <li><Link href="/vip" style={{ color: 'rgba(245,242,236,0.55)', textDecoration: 'none', fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase' }}>Coaching VIP</Link></li>
-          <li><Link href="/boutique" style={{ color: 'rgba(245,242,236,0.55)', textDecoration: 'none', fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase' }}>Boutique</Link></li>
+        <ul style={{ display: 'flex', gap: 'clamp(0.8rem, 2vw, 1.8rem)', listStyle: 'none', alignItems: 'center', margin: 0, padding: 0, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+          <li><Link href="/" style={navLinkStyle}>Accueil</Link></li>
+          <li><Link href="/webinaires" style={{ ...navLinkStyle, color: '#F1D382', fontWeight: 600 }}>Webinaires</Link></li>
+          <li><Link href="/mindshares" style={navLinkStyle}>Mindshares</Link></li>
+          <li><Link href="/workshops" style={navLinkStyle}>Workshops</Link></li>
+          <li><Link href="/podcasts" style={navLinkStyle}>Podcasts</Link></li>
+          <li><Link href="/vip" style={navLinkStyle}>Coaching VIP</Link></li>
+          <li><Link href="/boutique" style={navLinkStyle}>Boutique</Link></li>
           <li>
             <Link href="/login" style={{
               padding: '0.55rem 1.7rem', border: '1px solid rgba(196,153,58,0.45)', color: '#F1D382',
@@ -81,7 +89,7 @@ export default function WebinairesPage() {
       </nav>
 
       {/* Hero Header */}
-      <header style={{ padding: '16rem 4.5rem 6rem', textAlign: 'center', background: 'radial-gradient(circle at 50% 0%, rgba(196,153,58,0.1) 0%, transparent 70%)' }}>
+      <header style={{ padding: 'clamp(8.5rem, 16vw, 16rem) clamp(1rem, 4vw, 4.5rem) 6rem', textAlign: 'center', background: 'radial-gradient(circle at 50% 0%, rgba(196,153,58,0.1) 0%, transparent 70%)' }}>
         <p style={{ color: '#D4AF37', letterSpacing: '0.5em', fontSize: '0.65rem', marginBottom: '1.5rem', fontWeight: '600', textTransform: 'uppercase' }}>Formation Continue</p>
         <h1 style={{ 
           fontSize: 'clamp(3.5rem, 7vw, 6.5rem)', 
@@ -116,8 +124,8 @@ export default function WebinairesPage() {
       </header>
 
       {/* Grid Content */}
-      <main style={{ padding: '0 4.5rem 10rem', maxWidth: '1600px', margin: '0 auto' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '3.5rem' }}>
+      <main style={{ padding: '0 clamp(1rem, 4vw, 4.5rem) 10rem', maxWidth: '1600px', margin: '0 auto' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'clamp(1.25rem, 2.8vw, 3.5rem)' }}>
           {filteredWebinars.map((webinar) => (
             <Link 
               href={`/webinaires/${webinar.id}`} 
@@ -138,12 +146,12 @@ export default function WebinairesPage() {
                 boxShadow: hoveredId === webinar.id ? '0 30px 60px rgba(0,0,0,0.6), 0 0 30px rgba(196,153,58,0.08)' : 'none'
               }}>
                 {/* Poster Image Container - Ratio updated for "full" posters */}
-                <div style={{ position: 'relative', aspectRatio: '16/9', overflow: 'hidden', background: '#000' }}>
+                <div style={{ position: 'relative', aspectRatio: '1/1', overflow: 'hidden', background: '#000' }}>
                   <img 
                     src={getPosterUrl(webinar.posterFile)} 
                     alt={webinar.title}
                     style={{
-                      width: '100%', height: '100%', objectFit: 'contain', // Changed to contain to show full poster
+                      width: '100%', height: '100%', objectFit: 'cover',
                       transition: 'transform 1.2s cubic-bezier(0.16, 1, 0.3, 1)',
                       transform: hoveredId === webinar.id ? 'scale(1.05)' : 'scale(1)',
                       opacity: 0.95
@@ -162,20 +170,20 @@ export default function WebinairesPage() {
                 </div>
 
                 {/* Info Content */}
-                <div style={{ padding: '2.5rem', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                <div style={{ padding: 'clamp(1.1rem, 3vw, 2.5rem)', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                     <span style={{ fontSize: '0.6rem', color: 'rgba(196,153,58,0.4)', letterSpacing: '0.2em' }}>#{String(webinar.id).padStart(4, '0')}</span>
                     <span style={{ fontSize: '0.62rem', color: 'rgba(245,242,236,0.3)', letterSpacing: '0.1em' }}>{webinar.date}</span>
                   </div>
                   
                   <h3 style={{
-                    fontSize: '1.6rem', 
+                    fontSize: '1.45rem', 
                     fontWeight: '300', 
                     margin: '0 0 1.2rem', 
                     lineHeight: '1.2',
                     fontFamily: "'Cormorant Garamond', serif",
                     color: '#F5F2EC',
-                    height: '3.8rem',
+                    minHeight: '3.3rem',
                     overflow: 'hidden',
                     display: '-webkit-box',
                     WebkitLineClamp: 2,
@@ -185,16 +193,16 @@ export default function WebinairesPage() {
                   </h3>
                   
                   <p style={{ 
-                    fontSize: '0.85rem', 
+                    fontSize: '0.8rem', 
                     color: 'rgba(245,242,236,0.5)', 
-                    lineHeight: '1.7',
+                    lineHeight: '1.65',
                     marginBottom: '2rem',
-                    height: '5.8rem',
+                    fontWeight: '200',
+                    minHeight: '4rem',
                     overflow: 'hidden',
                     display: '-webkit-box',
-                    WebkitLineClamp: 4,
-                    WebkitBoxOrient: 'vertical',
-                    fontWeight: '200'
+                    WebkitLineClamp: 3,
+                    WebkitBoxOrient: 'vertical'
                   }}>
                     {webinar.description}
                   </p>
@@ -229,7 +237,7 @@ export default function WebinairesPage() {
       </main>
 
       {/* Footer - Standardized */}
-      <footer style={{ padding: '6rem 4.5rem', borderTop: '1px solid rgba(196,153,58,0.1)', textAlign: 'center', background: 'rgba(8,14,8,0.4)' }}>
+      <footer style={{ padding: '6rem clamp(1rem, 4vw, 4.5rem)', borderTop: '1px solid rgba(196,153,58,0.1)', textAlign: 'center', background: 'rgba(8,14,8,0.4)' }}>
         <img src="/logo-transparent.png" alt="Logo" style={{ height: '80px', width: 'auto', marginBottom: '2rem', opacity: 0.3, filter: 'grayscale(1)' }} />
         <p style={{ fontSize: '0.65rem', color: 'rgba(245,242,236,0.3)', letterSpacing: '0.3em', textTransform: 'uppercase', marginBottom: '1rem' }}>
           © 2026 Academy • L'Excellence Dentaire
@@ -238,6 +246,26 @@ export default function WebinairesPage() {
           FORMATION · COACHING · COMMUNAUTÉ
         </p>
       </footer>
+      <style>{`
+        @media (max-width: 1100px) {
+          nav ul li a {
+            font-size: 0.62rem !important;
+            letter-spacing: 0.14em !important;
+          }
+        }
+
+        @media (max-width: 900px) {
+          nav {
+            align-items: flex-start !important;
+            gap: 0.6rem;
+          }
+          nav ul {
+            width: 100%;
+            justify-content: flex-start !important;
+            row-gap: 0.55rem;
+          }
+        }
+      `}</style>
     </div>
   );
 }

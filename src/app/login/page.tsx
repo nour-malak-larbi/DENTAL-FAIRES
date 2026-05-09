@@ -30,7 +30,7 @@ export default function LoginPage() {
   return (
     <>
       <style>{`
-        .auth-bg { position:fixed;inset:0;z-index:0;overflow:hidden;background:#080E08; }
+        .auth-bg { position:fixed;inset:0;z-index:0;overflow:hidden;background:#091209; }
         .auth-bg-radial { position:absolute;inset:0;background:radial-gradient(ellipse 90% 80% at 50% 40%,#1C3A1C 0%,#0F1F0F 45%,#060C06 100%);opacity:0.85; }
         .auth-bg-glow { position:absolute;bottom:0;left:0;right:0;height:50%;background:radial-gradient(ellipse at 50% 100%,rgba(196,153,58,0.12) 0%,transparent 70%); }
         .auth-vignette { position:absolute;inset:0;background:radial-gradient(ellipse 100% 100% at 50% 50%,transparent 30%,rgba(8,14,8,0.6) 65%,rgba(8,14,8,0.95) 100%); }

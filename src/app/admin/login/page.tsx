@@ -32,7 +32,7 @@ export default function AdminLoginPage() {
   return (
     <>
       <style>{`
-        .adm-bg { position:fixed;inset:0;z-index:0;overflow:hidden;background:#040804; }
+        .adm-bg { position:fixed;inset:0;z-index:0;overflow:hidden;background:#091209; }
         .adm-bg-radial { position:absolute;inset:0;background:radial-gradient(ellipse 70% 70% at 50% 40%,#0A140A 0%,#060C06 50%,#020402 100%); }
         .adm-vignette { position:absolute;inset:0;background:radial-gradient(ellipse 100% 100% at 50% 50%,transparent 20%,rgba(2,4,2,0.7) 60%,rgba(2,4,2,0.98) 100%); }
         .adm-scanline { position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.05) 3px,rgba(0,0,0,0.05) 6px); }

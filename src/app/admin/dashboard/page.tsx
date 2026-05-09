@@ -131,7 +131,7 @@ export default function AdminDashboard() {
   const currentList = items[activeTab as keyof typeof items] || [];
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#040804', color: 'rgba(245,242,236,0.8)', fontFamily: "'Jost', sans-serif" }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#091209', color: 'rgba(245,242,236,0.8)', fontFamily: "'Jost', sans-serif" }}>
       {/* SIDEBAR */}
       <aside style={{ width: '280px', background: 'rgba(2,4,2,0.95)', borderRight: '1px solid rgba(196,153,58,0.1)', display: 'flex', flexDirection: 'column' }}>
         <div style={{ padding: '2rem 1.5rem', borderBottom: '1px solid rgba(196,153,58,0.05)' }}>

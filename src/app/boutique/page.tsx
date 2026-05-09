@@ -12,7 +12,7 @@ export default function BoutiquePage() {
   }, []);
 
   return (
-    <div style={{ backgroundColor: '#0A0F0A', minHeight: '100vh', color: 'white', fontFamily: "var(--font-inter), sans-serif" }}>
+    <div style={{ backgroundColor: '#091209', minHeight: '100vh', color: 'white', fontFamily: "var(--font-inter), sans-serif" }}>
       {/* Navigation */}
       <nav style={{
         position: 'fixed', top: 0, width: '100%', zIndex: 1000,

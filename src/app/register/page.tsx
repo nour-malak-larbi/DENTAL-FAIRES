@@ -34,7 +34,7 @@ export default function RegisterPage() {
       <style>{`
         .auth-bg {
           position: fixed; inset: 0; z-index: 0; overflow: hidden;
-          background: #080E08;
+          background: #091209;
         }
         .auth-bg-radial {
           position: absolute; inset: 0;

@@ -34,14 +34,14 @@ export default function MindshareDetailPage({ params }: { params: { id: string }
 
   if (!mindshare) {
     return (
-      <div style={{ backgroundColor: '#0A0F0A', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontFamily: 'var(--font-inter), sans-serif' }}>
+      <div style={{ backgroundColor: '#091209', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontFamily: 'var(--font-inter), sans-serif' }}>
         <p>Article non trouvé (ID: {params.id})</p>
       </div>
     );
   }
 
   return (
-    <div style={{ backgroundColor: '#0A0F0A', minHeight: '100vh', color: 'white', fontFamily: "var(--font-inter), sans-serif" }}>
+    <div style={{ backgroundColor: '#091209', minHeight: '100vh', color: 'white', fontFamily: "var(--font-inter), sans-serif" }}>
       {/* Navigation */}
       <nav style={{
         position: 'fixed', top: 0, width: '100%', zIndex: 1000,

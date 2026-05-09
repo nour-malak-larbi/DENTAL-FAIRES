@@ -3,21 +3,16 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { mindshares, getMindshareById, getPosterUrl } from '@/lib/mindshares-data';
 
+import Navbar from '@/components/Navbar';
+
 export default function MindshareDetailPage({ params }: { params: { id: string } }) {
   const [hasAccess, setHasAccess] = useState(false);
   const [meetLink, setMeetLink] = useState<string | null>(null);
   const [purchaseStatus, setPurchaseStatus] = useState<string | null>(null);
-  const [isScrolled, setIsScrolled] = useState(false);
   const [mindshare, setMindshare] = useState<any>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [showRegModal, setShowRegModal] = useState(false);
   const [registered, setRegistered] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   useEffect(() => {
     // Fetch mindshare data from the database
@@ -102,41 +97,18 @@ export default function MindshareDetailPage({ params }: { params: { id: string }
 
   return (
     <div style={{ backgroundColor: '#091209', minHeight: '100vh', color: 'white', fontFamily: "var(--font-inter), sans-serif" }}>
-      {/* Navigation */}
-      <nav style={{
-        position: 'fixed', top: 0, width: '100%', zIndex: 1000,
-        padding: isScrolled ? '1rem 4.5rem' : '1.5rem 4.5rem',
-        backgroundColor: isScrolled ? 'rgba(10, 15, 10, 0.95)' : 'transparent',
-        backdropFilter: isScrolled ? 'blur(10px)' : 'none',
-        transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center'
-      }}>
-        <Link href="/" style={{ textDecoration: 'none' }}>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <img src="/logo-transparent.png" alt="Logo" style={{ height: '35px', width: 'auto', filter: 'drop-shadow(0 0 10px rgba(196,153,58,0.4))' }} />
-          </div>
-        </Link>
-        <ul style={{ display: 'flex', gap: '1.8rem', listStyle: 'none', alignItems: 'center', margin: 0, padding: 0 }}>
-          <li><Link href="/" style={{ color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: '0.7rem', letterSpacing: '0.15em' }}>ACCUEIL</Link></li>
-          <li><Link href="/webinaires" style={{ color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: '0.7rem', letterSpacing: '0.15em' }}>WEBINAIRES</Link></li>
-          <li><Link href="/mindshares" style={{ color: '#C4993A', textDecoration: 'none', fontSize: '0.7rem', letterSpacing: '0.15em' }}>MINDSHARES</Link></li>
-          <li><Link href="/workshops" style={{ color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: '0.7rem', letterSpacing: '0.15em' }}>WORKSHOPS</Link></li>
-          <li><Link href="/podcasts" style={{ color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: '0.7rem', letterSpacing: '0.15em' }}>PODCASTS</Link></li>
-          <li><Link href="/vip" style={{ color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: '0.7rem', letterSpacing: '0.15em' }}>COACHING VIP</Link></li>
-          <li><Link href="/boutique" style={{ color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: '0.7rem', letterSpacing: '0.15em' }}>BOUTIQUE</Link></li>
-        </ul>
-      </nav>
+      <Navbar />
 
-      <main style={{ display: 'flex', minHeight: '100vh' }}>
+      <main style={{ display: 'flex', minHeight: '100vh', flexDirection: 'row', flexWrap: 'wrap' }}>
         {/* Left: Sticky Poster */}
-        <div style={{ flex: '1', position: 'relative', height: '100vh', overflow: 'hidden' }}>
+        <div style={{ flex: '1', minWidth: '320px', position: 'relative', height: 'clamp(300px, 50vh, 100vh)', overflow: 'hidden' }}>
           <img 
             src={getPosterUrl(mindshare.posterFile)} 
             alt={mindshare.title}
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
           <div style={{
-            position: 'absolute', top: '10rem', left: '4.5rem',
+            position: 'absolute', top: '10rem', left: '2rem',
             padding: '0.5rem 1rem', background: '#C4993A', color: 'white',
             fontSize: '0.7rem', fontWeight: 'bold', letterSpacing: '0.1em'
           }}>
@@ -145,7 +117,7 @@ export default function MindshareDetailPage({ params }: { params: { id: string }
         </div>
 
         {/* Right: Content */}
-        <div style={{ flex: '1.2', padding: '10rem 6rem 8rem', backgroundColor: '#0D140D', overflowY: 'auto' }}>
+        <div style={{ flex: '1.2', minWidth: '320px', padding: 'clamp(4rem, 10vw, 10rem) clamp(1.5rem, 5vw, 6rem) 8rem', backgroundColor: '#0D140D', overflowY: 'auto' }}>
           <div style={{ maxWidth: '800px' }}>
             <div style={{ display: 'flex', gap: '0.6rem', marginBottom: '2rem' }}>
               {mindshare.tags.map(tag => (

@@ -4,22 +4,17 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { webinars, getWebinarById, getPosterUrl } from '@/lib/webinairs-data';
 
+import Navbar from '@/components/Navbar';
+
 export default function WebinarDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const [hasAccess, setHasAccess] = useState(false);
   const [meetLink, setMeetLink] = useState<string | null>(null);
   const [purchaseStatus, setPurchaseStatus] = useState<string | null>(null);
-  const [isScrolled, setIsScrolled] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [webinar, setWebinar] = useState<any>(null);
   const [registered, setRegistered] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   useEffect(() => {
     // Fetch webinar data from the database
@@ -134,47 +129,10 @@ export default function WebinarDetailPage({ params }: { params: { id: string } }
 
   return (
     <div style={{ backgroundColor: '#091209', minHeight: '100vh', color: 'white', fontFamily: "'Jost', sans-serif" }}>
-      {/* Navigation - Standardized */}
-      <nav style={{
-        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000,
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: isScrolled ? '0.5rem 4.5rem' : '0.8rem 4.5rem',
-        backgroundColor: isScrolled ? '#091209' : 'transparent',
-        borderBottom: isScrolled ? '1px solid rgba(212,175,55,0.2)' : 'none',
-        transition: 'all 0.6s cubic-bezier(0.25, 0.1, 0.25, 1)',
-        backdropFilter: isScrolled ? 'blur(20px)' : 'none'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Link href="/" style={{ textDecoration: 'none' }}>
-            <img 
-              src="/logo-transparent.png" 
-              alt="Dental Fairies" 
-              style={{ 
-                height: isScrolled ? '120px' : '200px', 
-                width: 'auto', 
-                margin: isScrolled ? '-40px 0' : '-65px 0',
-                filter: 'drop-shadow(0 0 16px rgba(196,153,58,0.55))',
-                transition: 'all 0.6s ease',
-                display: 'block'
-              }} 
-            />
-          </Link>
-        </div>
+      <Navbar />
 
-        <ul style={{ display: 'flex', gap: '1.8rem', listStyle: 'none', alignItems: 'center', margin: 0, padding: 0 }}>
-          <li><Link href="/" style={{ color: 'rgba(245,242,236,0.55)', textDecoration: 'none', fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase' }}>Accueil</Link></li>
-          <li><Link href="/webinaires" style={{ color: '#F1D382', textDecoration: 'none', fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase' }}>Webinaires</Link></li>
-          <li><Link href="/mindshares" style={{ color: 'rgba(245,242,236,0.55)', textDecoration: 'none', fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase' }}>Mindshares</Link></li>
-          <li><Link href="/workshops" style={{ color: 'rgba(245,242,236,0.55)', textDecoration: 'none', fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase' }}>Workshops</Link></li>
-          <li><Link href="/podcasts" style={{ color: 'rgba(245,242,236,0.55)', textDecoration: 'none', fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase' }}>Podcasts</Link></li>
-          <li><Link href="/vip" style={{ color: 'rgba(245,242,236,0.55)', textDecoration: 'none', fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase' }}>Coaching VIP</Link></li>
-          <li><Link href="/boutique" style={{ color: 'rgba(245,242,236,0.55)', textDecoration: 'none', fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase' }}>Boutique</Link></li>
-          <li><Link href="/login" style={{ padding: '0.55rem 1.7rem', border: '1px solid rgba(196,153,58,0.45)', color: '#F1D382', textDecoration: 'none', fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase' }}>Connexion</Link></li>
-        </ul>
-      </nav>
-
-      <main style={{ paddingTop: '18rem', paddingBottom: '8rem' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 2rem', display: 'flex', gap: '5rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+      <main style={{ paddingTop: 'clamp(8rem, 15vw, 12rem)', paddingBottom: '4rem' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 1.5rem', display: 'flex', gap: '3rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
           
           {/* Left Side: Poster - Fixed Fit */}
           <div style={{ flex: '1', minWidth: '320px', position: 'relative' }}>

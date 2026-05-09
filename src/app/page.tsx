@@ -1,7 +1,7 @@
-
 'use client';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Navbar from '@/components/Navbar';
 
 export default function Home() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -436,21 +436,7 @@ document.addEventListener('mousemove', (e) => {
 <div className="content">
 
   {/*  NAV  */}
-  <nav id="nav" className={isScrolled ? 'scrolled' : ''}>
-    <div className="nav-logo">
-      <img src="/logo-transparent.png" alt="Dental Fairies Academy" style={{height:'200px', width:'auto', margin:'-65px 0 -65px', filter:'drop-shadow(0 0 16px rgba(196,153,58,0.55))', display:'block'}}/>
-    </div>
-    <ul className="nav-links">
-      <li><Link href="/" style={{ color: 'var(--gold-lt)' }}>Accueil</Link></li>
-      <li><Link href="/webinaires">Webinaires</Link></li>
-      <li><Link href="/mindshares">Mindshares</Link></li>
-      <li><Link href="/workshops">Workshops</Link></li>
-      <li><Link href="/podcasts">Podcasts</Link></li>
-      <li><Link href="/vip">Coaching VIP</Link></li>
-      <li><Link href="/boutique">Boutique</Link></li>
-      <li><Link href="/login" className="nav-btn">Connexion</Link></li>
-    </ul>
-  </nav>
+  <Navbar />
 
   {/*  HERO  */}
   <section className="hero">

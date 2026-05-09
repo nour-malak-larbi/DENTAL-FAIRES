@@ -2,52 +2,12 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 
+import Navbar from '@/components/Navbar';
+
 export default function BoutiquePage() {
-  const [isScrolled, setIsScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   return (
     <div style={{ backgroundColor: '#091209', minHeight: '100vh', color: 'white', fontFamily: "var(--font-inter), sans-serif" }}>
-      {/* Navigation */}
-      <nav style={{
-        position: 'fixed', top: 0, width: '100%', zIndex: 1000,
-        padding: isScrolled ? '0.5rem 4.5rem' : '1rem 4.5rem',
-        backgroundColor: isScrolled ? 'rgba(10, 15, 10, 0.95)' : 'transparent',
-        backdropFilter: isScrolled ? 'blur(12px)' : 'none',
-        transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        borderBottom: isScrolled ? '1px solid rgba(196, 153, 58, 0.15)' : '1px solid transparent'
-      }}>
-        <Link href="/" style={{ textDecoration: 'none' }}>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <img 
-              src="/logo-transparent.png" 
-              alt="Dental Fairies" 
-              style={{ 
-                height: isScrolled ? '120px' : '180px', 
-                width: 'auto', 
-                margin: isScrolled ? '-40px 0' : '-65px 0',
-                filter: 'drop-shadow(0 0 20px rgba(196,153,58,0.4))',
-                transition: 'all 0.5s ease'
-              }} 
-            />
-          </div>
-        </Link>
-        <ul style={{ display: 'flex', gap: '2rem', listStyle: 'none', alignItems: 'center', margin: 0, padding: 0 }}>
-          <li><Link href="/" style={{ color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: '0.65rem', letterSpacing: '0.15em', fontWeight: '500' }}>ACCUEIL</Link></li>
-          <li><Link href="/webinaires" style={{ color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: '0.65rem', letterSpacing: '0.15em', fontWeight: '500' }}>WEBINAIRES</Link></li>
-          <li><Link href="/mindshares" style={{ color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: '0.65rem', letterSpacing: '0.15em', fontWeight: '500' }}>MINDSHARES</Link></li>
-          <li><Link href="/workshops" style={{ color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: '0.65rem', letterSpacing: '0.15em', fontWeight: '500' }}>WORKSHOPS</Link></li>
-          <li><Link href="/podcasts" style={{ color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: '0.65rem', letterSpacing: '0.15em', fontWeight: '500' }}>PODCASTS</Link></li>
-          <li><Link href="/vip" style={{ color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: '0.65rem', letterSpacing: '0.15em', fontWeight: '500' }}>COACHING VIP</Link></li>
-          <li><Link href="/boutique" style={{ color: '#C4993A', textDecoration: 'none', fontSize: '0.65rem', letterSpacing: '0.15em', fontWeight: '600' }}>BOUTIQUE</Link></li>
-        </ul>
-      </nav>
+      <Navbar />
 
       {/* Hero Section */}
       <section style={{ height: '70vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', position: 'relative', padding: '0 4.5rem' }}>

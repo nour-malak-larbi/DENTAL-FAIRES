@@ -8,16 +8,10 @@ const UPCOMING = [
   { id: 4, title: "L'ère du numérique : de l'empreinte au design", guest: "Dr. Sonia T.", role: "Prothésiste", date: "Bientôt" },
 ];
 
+import Navbar from '@/components/Navbar';
+
 export default function PodcastsPage() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const navLinkStyle: React.CSSProperties = {
-    color: 'rgba(245,242,236,0.6)',
-    textDecoration: 'none',
-    fontSize: '0.68rem',
-    letterSpacing: '0.16em',
-    textTransform: 'uppercase',
-    fontWeight: 500
-  };
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -27,54 +21,7 @@ export default function PodcastsPage() {
 
   return (
     <div style={{ backgroundColor: '#091209', minHeight: '100vh', color: 'white', fontFamily: "'Jost', sans-serif" }}>
-      {/* Navigation */}
-      <nav style={{
-        position: 'fixed', top: 0, width: '100%', zIndex: 1000,
-        padding: isScrolled ? '0.55rem clamp(1rem, 4vw, 4.5rem)' : '0.9rem clamp(1rem, 4vw, 4.5rem)',
-        backgroundColor: isScrolled ? 'rgba(10, 15, 10, 0.95)' : 'transparent',
-        backdropFilter: isScrolled ? 'blur(12px)' : 'none',
-        transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        borderBottom: isScrolled ? '1px solid rgba(196, 153, 58, 0.15)' : '1px solid transparent'
-      }}>
-        <Link href="/" style={{ textDecoration: 'none' }}>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <img 
-              src="/logo-transparent.png" 
-              alt="Dental Fairies" 
-              style={{ 
-                height: isScrolled ? '108px' : '145px', 
-                width: 'auto', 
-                margin: isScrolled ? '-28px 0' : '-38px 0',
-                filter: 'drop-shadow(0 0 20px rgba(196,153,58,0.4))',
-                transition: 'all 0.5s ease'
-              }} 
-            />
-          </div>
-        </Link>
-        <ul style={{ display: 'flex', gap: 'clamp(0.8rem, 2vw, 2rem)', listStyle: 'none', alignItems: 'center', margin: 0, padding: 0, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-          <li><Link href="/" style={navLinkStyle}>ACCUEIL</Link></li>
-          <li><Link href="/webinaires" style={navLinkStyle}>WEBINAIRES</Link></li>
-          <li><Link href="/mindshares" style={navLinkStyle}>MINDSHARES</Link></li>
-          <li><Link href="/workshops" style={navLinkStyle}>WORKSHOPS</Link></li>
-          <li><Link href="/podcasts" style={{ ...navLinkStyle, color: '#F1D382', fontWeight: 600 }}>PODCASTS</Link></li>
-          <li><Link href="/vip" style={navLinkStyle}>COACHING VIP</Link></li>
-          <li><Link href="/boutique" style={navLinkStyle}>BOUTIQUE</Link></li>
-          <li>
-            <Link href="/login" style={{
-              padding: '0.55rem 1.7rem',
-              border: '1px solid rgba(196,153,58,0.45)',
-              color: '#F1D382',
-              textDecoration: 'none',
-              fontSize: '0.68rem',
-              letterSpacing: '0.16em',
-              textTransform: 'uppercase',
-              fontWeight: 500,
-              background: 'transparent'
-            }}>CONNEXION</Link>
-          </li>
-        </ul>
-      </nav>
+      <Navbar />
 
       {/* Hero Section */}
       <section style={{ padding: 'clamp(8.5rem, 16vw, 14rem) clamp(1rem, 4vw, 4.5rem) 6rem', textAlign: 'center', background: 'radial-gradient(circle at 50% 0%, rgba(196,153,58,0.1) 0%, transparent 70%)' }}>
@@ -181,26 +128,6 @@ export default function PodcastsPage() {
           © 2026 L'EXCELLENCE DENTAIRE RÉINVENTÉE
         </p>
       </footer>
-      <style>{`
-        @media (max-width: 1100px) {
-          nav ul li a {
-            font-size: 0.62rem !important;
-            letter-spacing: 0.12em !important;
-          }
-        }
-
-        @media (max-width: 900px) {
-          nav {
-            align-items: flex-start !important;
-            gap: 0.6rem;
-          }
-          nav ul {
-            width: 100%;
-            justify-content: flex-start !important;
-            row-gap: 0.55rem;
-          }
-        }
-      `}</style>
     </div>
   );
 }

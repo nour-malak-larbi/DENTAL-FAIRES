@@ -16,9 +16,25 @@ export default function WorkshopDetailPage({ params }: { params: { id: string } 
   const [imgLoaded, setImgLoaded] = useState(false);
 
   useEffect(() => {
-    // Fetch workshop data
-    const fetchedWorkshop = getWorkshopById(Number(params.id));
-    setWorkshop(fetchedWorkshop);
+    // Fetch workshop data from the database
+    const fetchWorkshop = async () => {
+      try {
+        const res = await fetch(`/api/workshops/${params.id}`);
+        if (res.ok) {
+          const data = await res.json();
+          setWorkshop(data);
+        } else {
+          // Fallback to static if not found or error
+          const fetchedWorkshop = getWorkshopById(Number(params.id));
+          setWorkshop(fetchedWorkshop);
+        }
+      } catch (err) {
+        console.error('Failed to fetch workshop:', err);
+        const fetchedWorkshop = getWorkshopById(Number(params.id));
+        setWorkshop(fetchedWorkshop);
+      }
+    };
+    fetchWorkshop();
   }, [params.id]);
 
   useEffect(() => {

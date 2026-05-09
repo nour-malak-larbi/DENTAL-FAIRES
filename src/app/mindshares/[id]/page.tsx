@@ -20,9 +20,25 @@ export default function MindshareDetailPage({ params }: { params: { id: string }
   }, []);
 
   useEffect(() => {
-    // Fetch mindshare data
-    const fetchedMindshare = getMindshareById(Number(params.id));
-    setMindshare(fetchedMindshare);
+    // Fetch mindshare data from the database
+    const fetchMindshare = async () => {
+      try {
+        const res = await fetch(`/api/mindshares/${params.id}`);
+        if (res.ok) {
+          const data = await res.json();
+          setMindshare(data);
+        } else {
+          // Fallback to static if not found or error
+          const fetchedMindshare = getMindshareById(Number(params.id));
+          setMindshare(fetchedMindshare);
+        }
+      } catch (err) {
+        console.error('Failed to fetch mindshare:', err);
+        const fetchedMindshare = getMindshareById(Number(params.id));
+        setMindshare(fetchedMindshare);
+      }
+    };
+    fetchMindshare();
   }, [params.id]);
 
   useEffect(() => {

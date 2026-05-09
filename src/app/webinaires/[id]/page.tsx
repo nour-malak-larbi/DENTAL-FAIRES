@@ -22,9 +22,25 @@ export default function WebinarDetailPage({ params }: { params: { id: string } }
   }, []);
 
   useEffect(() => {
-    // Fetch webinar data
-    const fetchedWebinar = getWebinarById(Number(params.id));
-    setWebinar(fetchedWebinar);
+    // Fetch webinar data from the database
+    const fetchWebinar = async () => {
+      try {
+        const res = await fetch(`/api/webinars/${params.id}`);
+        if (res.ok) {
+          const data = await res.json();
+          setWebinar(data);
+        } else {
+          // Fallback to static if not found or error
+          const fetchedWebinar = getWebinarById(Number(params.id));
+          setWebinar(fetchedWebinar);
+        }
+      } catch (err) {
+        console.error('Failed to fetch webinar:', err);
+        const fetchedWebinar = getWebinarById(Number(params.id));
+        setWebinar(fetchedWebinar);
+      }
+    };
+    fetchWebinar();
   }, [params.id]);
 
   useEffect(() => {

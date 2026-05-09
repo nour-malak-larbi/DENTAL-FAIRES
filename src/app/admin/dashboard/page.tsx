@@ -265,6 +265,16 @@ export default function AdminDashboard() {
                   />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', gridColumn: '1 / -1' }}>
+                  <label style={{ fontSize: '0.65rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--gold)' }}>Lien Google Meet (Optionnel)</label>
+                  <input 
+                    type="url" 
+                    placeholder="https://meet.google.com/..."
+                    value={editingItem.meetLink || ''} 
+                    onChange={e => setEditingItem({...editingItem, meetLink: e.target.value})}
+                    style={{ background: 'rgba(17,26,17,0.8)', border: '1px solid rgba(196,153,58,0.2)', padding: '0.8rem 1rem', color: 'var(--white)', outline: 'none' }}
+                  />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', gridColumn: '1 / -1' }}>
                   <label style={{ fontSize: '0.65rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--gold)' }}>Image / Poster (Nom du fichier ou URL)</label>
                   <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                     {(editingItem.posterFile || editingItem.image) && (

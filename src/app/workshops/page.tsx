@@ -5,9 +5,24 @@ import { workshops, getWorkshopPosterUrl } from '@/lib/workshops-data';
 
 export default function WorkshopsPage() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [hoveredId, setHoveredId] = useState<number | null>(null);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [workshops, setWorkshops] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const fetchWorkshops = async () => {
+      try {
+        const res = await fetch('/api/workshops');
+        const data = await res.json();
+        setWorkshops(data);
+      } catch (err) {
+        console.error('Failed to fetch workshops:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchWorkshops();
+
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);

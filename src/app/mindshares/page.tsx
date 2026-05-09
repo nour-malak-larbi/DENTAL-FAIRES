@@ -14,9 +14,24 @@ const ALL_CATEGORIES = [
 export default function MindsharesPage() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeCategory, setActiveCategory] = useState('all');
-  const [hoveredId, setHoveredId] = useState<number | null>(null);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [mindshares, setMindshares] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const fetchMindshares = async () => {
+      try {
+        const res = await fetch('/api/mindshares');
+        const data = await res.json();
+        setMindshares(data);
+      } catch (err) {
+        console.error('Failed to fetch mindshares:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMindshares();
+
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);

@@ -14,7 +14,10 @@ const ALL_CATEGORIES = [
 export default function WebinairesPage() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeCategory, setActiveCategory] = useState('all');
-  const [hoveredId, setHoveredId] = useState<number | null>(null);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [webinars, setWebinars] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const navLinkStyle: React.CSSProperties = {
     color: 'rgba(245,242,236,0.6)',
     textDecoration: 'none',
@@ -25,6 +28,19 @@ export default function WebinairesPage() {
   };
 
   useEffect(() => {
+    const fetchWebinars = async () => {
+      try {
+        const res = await fetch('/api/webinars');
+        const data = await res.json();
+        setWebinars(data);
+      } catch (err) {
+        console.error('Failed to fetch webinars:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchWebinars();
+
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);

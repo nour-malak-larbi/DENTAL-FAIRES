@@ -223,7 +223,8 @@ export default function AdminDashboard() {
     }
   };
 
-  const currentList = items[activeTab as keyof typeof items] || [];
+  const activeItems = items[activeTab as keyof typeof items];
+  const currentList: any[] = Array.isArray(activeItems) ? activeItems : [];
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: '#091209', color: 'rgba(245,242,236,0.8)', fontFamily: "'Jost', sans-serif" }}>

@@ -48,12 +48,94 @@ const OFFERS = [
 
 export default function VipPage() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
+  const [hasAccess, setHasAccess] = useState(false);
+  const [purchaseStatus, setPurchaseStatus] = useState<string | null>(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [selectedOffer, setSelectedOffer] = useState<any>(null);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      // Verify token
+      fetch('/api/auth/me', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.user) {
+          setIsConnected(true);
+          // Check access to VIP coaching
+          fetch('/api/access/check', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              productType: 'vip',
+              productId: 'vip-coaching' // Using a generic ID for VIP access
+            })
+          })
+          .then(res => res.json())
+          .then(accessData => {
+            setHasAccess(accessData.hasAccess);
+            setPurchaseStatus(accessData.purchaseStatus);
+          })
+          .catch(() => {
+            setHasAccess(false);
+          });
+        }
+      })
+      .catch(() => {
+        localStorage.removeItem('token');
+      });
+    }
+  }, []);
+
+  const handlePaymentSubmit = async (formData: any) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('Vous devez être connecté pour effectuer un paiement');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/purchase', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          productType: 'vip',
+          productId: selectedOffer.id,
+          productName: `Coaching VIP - ${selectedOffer.label}`,
+          amount: selectedOffer.price.replace(/\s/g, ''),
+          paymentMethod: formData.paymentMethod,
+          receiptFile: formData.receiptFile
+        })
+      });
+
+      if (response.ok) {
+        setShowPaymentModal(false);
+        setPurchaseStatus('pending');
+        alert('Votre paiement a été soumis. L\'équipe administrative validera votre accès sous 24h.');
+      } else {
+        alert('Erreur lors de la soumission du paiement');
+      }
+    } catch (error) {
+      alert('Erreur lors de la soumission du paiement');
+    }
+  };
 
   return (
     <div style={{ backgroundColor: '#091209', minHeight: '100vh', color: 'white', fontFamily: "var(--font-inter), sans-serif" }}>
@@ -114,18 +196,58 @@ export default function VipPage() {
           </p>
           
           <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center' }}>
-            <a href="#offres" style={{ 
-              padding: '1.4rem 3.5rem', 
-              background: 'linear-gradient(135deg, #C4993A, #8B6820)', 
-              color: 'white', 
-              textDecoration: 'none', 
-              fontWeight: '700', 
-              fontSize: '0.75rem', 
-              letterSpacing: '0.25em', 
-              borderRadius: '2px', 
-              boxShadow: '0 15px 40px rgba(196,153,58,0.25)',
-              transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
-            }}>VOIR LES OFFRES</a>
+            {!isConnected ? (
+              <Link href="/login" style={{ 
+                padding: '1.4rem 3.5rem', 
+                background: 'linear-gradient(135deg, #C4993A, #8B6820)', 
+                color: 'white', 
+                textDecoration: 'none', 
+                fontWeight: '700', 
+                fontSize: '0.75rem', 
+                letterSpacing: '0.25em', 
+                borderRadius: '2px', 
+                boxShadow: '0 15px 40px rgba(196,153,58,0.25)',
+                transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
+              }}>S'INSCRIRE POUR ACCÉDER</Link>
+            ) : hasAccess ? (
+              <div style={{ padding: '2rem', background: 'rgba(196,153,58,0.05)', border: '1px solid rgba(196,153,58,0.2)', borderRadius: '4px' }}>
+                <p style={{ color: '#C4993A', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '1rem', letterSpacing: '0.1em' }}>✓ VOUS AVEZ ACCÈS AU COACHING VIP</p>
+                <a href="#offres" style={{ 
+                  display: 'inline-block',
+                  padding: '1rem 2rem', 
+                  background: '#C4993A', 
+                  color: 'white', 
+                  textDecoration: 'none', 
+                  fontWeight: '700', 
+                  fontSize: '0.75rem', 
+                  letterSpacing: '0.25em', 
+                  borderRadius: '2px', 
+                  transition: 'all 0.4s'
+                }}>VOIR MES OFFRES</a>
+              </div>
+            ) : purchaseStatus === 'pending' ? (
+              <div style={{ padding: '2rem', background: 'rgba(255,165,0,0.05)', border: '1px solid rgba(255,165,0,0.2)', borderRadius: '4px' }}>
+                <p style={{ color: '#FFA500', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '1rem', letterSpacing: '0.1em' }}>⏳ PAIEMENT EN COURS DE VALIDATION</p>
+                <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.8rem' }}>
+                  Votre reçu a été envoyé. L'équipe administrative validera votre accès sous 24h.
+                </p>
+              </div>
+            ) : (
+              <button onClick={() => setShowPaymentModal(true)} style={{ 
+                padding: '1.4rem 3.5rem', 
+                background: 'linear-gradient(135deg, #C4993A, #8B6820)', 
+                color: 'white', 
+                textDecoration: 'none', 
+                fontWeight: '700', 
+                fontSize: '0.75rem', 
+                letterSpacing: '0.25em', 
+                borderRadius: '2px', 
+                boxShadow: '0 15px 40px rgba(196,153,58,0.25)',
+                transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                border: 'none',
+                cursor: 'pointer'
+              }}>PROCÉDER AU PAIEMENT</button>
+            )}
             <button style={{ 
               padding: '1.4rem 3.5rem', 
               background: 'none', 
@@ -217,14 +339,30 @@ export default function VipPage() {
                   ))}
                 </ul>
 
-                <button style={{
-                  padding: '1.4rem',
-                  background: offer.highlight ? '#C4993A' : 'transparent',
-                  border: offer.highlight ? 'none' : '1px solid rgba(255,255,255,0.15)',
-                  color: offer.highlight ? '#0A0F0A' : '#F5F2EC',
-                  fontWeight: '800', fontSize: '0.75rem', letterSpacing: '0.25em', cursor: 'pointer',
-                  transition: 'all 0.4s'
-                }}>CHOISIR CE FORFAIT</button>
+                <button 
+                  onClick={() => {
+                    if (!isConnected) {
+                      window.location.href = '/login';
+                      return;
+                    }
+                    if (hasAccess) {
+                      alert('Vous avez déjà accès au coaching VIP');
+                      return;
+                    }
+                    setSelectedOffer(offer);
+                    setShowPaymentModal(true);
+                  }}
+                  style={{
+                    padding: '1.4rem',
+                    background: offer.highlight ? '#C4993A' : 'transparent',
+                    border: offer.highlight ? 'none' : '1px solid rgba(255,255,255,0.15)',
+                    color: offer.highlight ? '#0A0F0A' : '#F5F2EC',
+                    fontWeight: '800', fontSize: '0.75rem', letterSpacing: '0.25em', cursor: 'pointer',
+                    transition: 'all 0.4s'
+                  }}
+                >
+                  {!isConnected ? 'S\'INSCRIRE' : hasAccess ? 'ACCÈS DÉJÀ ACQUIS' : 'CHOISIR CE FORFAIT'}
+                </button>
               </div>
             ))}
           </div>
@@ -284,6 +422,143 @@ export default function VipPage() {
           © 2026 L'EXCELLENCE DENTAIRE RÉINVENTÉE
         </p>
       </footer>
+
+      {/* Payment Modal */}
+      {showPaymentModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.8)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000
+        }}>
+          <div style={{
+            backgroundColor: '#091209',
+            border: '1px solid rgba(196,153,58,0.3)',
+            borderRadius: '8px',
+            padding: '2rem',
+            maxWidth: '500px',
+            width: '90%',
+            maxHeight: '80vh',
+            overflow: 'auto'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+              <h3 style={{ color: '#C4993A', fontSize: '1.5rem', margin: 0 }}>Paiement - {selectedOffer?.label}</h3>
+              <button
+                onClick={() => setShowPaymentModal(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'white',
+                  fontSize: '1.5rem',
+                  cursor: 'pointer'
+                }}
+              >×</button>
+            </div>
+
+            <div style={{ marginBottom: '2rem' }}>
+              <p style={{ color: 'white', marginBottom: '1rem' }}>
+                Montant: <span style={{ color: '#C4993A', fontWeight: 'bold' }}>{selectedOffer?.price}€</span>
+              </p>
+              <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', lineHeight: '1.5' }}>
+                Veuillez effectuer le paiement par virement bancaire ou autre moyen, puis télécharger votre reçu de paiement ci-dessous.
+                L'équipe administrative validera votre accès sous 24h.
+              </p>
+            </div>
+
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.target as HTMLFormElement);
+              const data = {
+                paymentMethod: formData.get('paymentMethod'),
+                receiptFile: formData.get('receiptFile')
+              };
+              handlePaymentSubmit(data);
+            }}>
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{ color: 'white', display: 'block', marginBottom: '0.5rem' }}>
+                  Moyen de paiement
+                </label>
+                <select
+                  name="paymentMethod"
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    backgroundColor: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(196,153,58,0.3)',
+                    borderRadius: '4px',
+                    color: 'white',
+                    fontSize: '0.9rem'
+                  }}
+                >
+                  <option value="">Sélectionner un moyen de paiement</option>
+                  <option value="virement">Virement bancaire</option>
+                  <option value="paypal">PayPal</option>
+                  <option value="autre">Autre</option>
+                </select>
+              </div>
+
+              <div style={{ marginBottom: '2rem' }}>
+                <label style={{ color: 'white', display: 'block', marginBottom: '0.5rem' }}>
+                  Reçu de paiement (PDF ou image)
+                </label>
+                <input
+                  type="file"
+                  name="receiptFile"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    backgroundColor: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(196,153,58,0.3)',
+                    borderRadius: '4px',
+                    color: 'white',
+                    fontSize: '0.9rem'
+                  }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowPaymentModal(false)}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    background: 'none',
+                    border: '1px solid rgba(255,255,255,0.3)',
+                    color: 'white',
+                    borderRadius: '4px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    background: '#C4993A',
+                    border: 'none',
+                    color: 'white',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  Soumettre le paiement
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

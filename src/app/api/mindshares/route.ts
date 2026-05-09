@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { verifyToken } from '@/lib/auth';
 
 export async function GET() {
   try {
@@ -14,6 +15,12 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    // Check authentication
+    const authUser = verifyToken(request);
+    if (!authUser) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const data = await request.json();
     const mindshare = await prisma.mindshare.create({
       data: {

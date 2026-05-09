@@ -5,36 +5,136 @@ import { workshops, getWorkshopById, getWorkshopPosterUrl } from '@/lib/workshop
 import { Workshop } from '@/lib/workshops-data';
 
 export default function WorkshopDetailPage({ params }: { params: { id: string } }) {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [imgLoaded, setImgLoaded] = useState(false);
+  const [hasAccess, setHasAccess] = useState(false);
+  const [meetLink, setMeetLink] = useState<string | null>(null);
+  const [purchaseStatus, setPurchaseStatus] = useState<string | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [workshop, setWorkshop] = useState<any>(null);
   const [purchased, setPurchased] = useState(false);
   const [showRegModal, setShowRegModal] = useState(false);
-  const [isConnected, setIsConnected] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    // Fetch workshop data
+    const fetchedWorkshop = getWorkshopById(Number(params.id));
+    setWorkshop(fetchedWorkshop);
+  }, [params.id]);
 
-  const handlePurchaseClick = () => {
-    if (!isConnected) {
-      setShowRegModal(true);
-    } else {
-      setPurchased(true);
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      // Verify token
+      fetch('/api/auth/me', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.user) {
+          setIsConnected(true);
+          // Check access to this workshop
+          if (workshop) {
+            fetch('/api/access/check', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({
+                productType: 'workshop',
+                productId: workshop.id
+              })
+            })
+            .then(res => res.json())
+            .then(accessData => {
+              setHasAccess(accessData.hasAccess);
+              setMeetLink(accessData.meetLink);
+              setPurchaseStatus(accessData.purchaseStatus);
+            })
+            .catch(() => {
+              setHasAccess(false);
+            });
+          }
+        }
+      })
+      .catch(() => {
+        localStorage.removeItem('token');
+      });
+    }
+  }, [workshop]);
+
+  const handlePaymentSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get('email') as string;
+    const receipt = formData.get('receipt') as File;
+
+    if (!email || !receipt) {
+      alert('Veuillez remplir tous les champs');
+      return;
+    }
+
+    const paymentData = new FormData();
+    paymentData.append('email', email);
+    paymentData.append('receipt', receipt);
+    paymentData.append('productType', 'workshop');
+    paymentData.append('productId', workshop.id);
+
+    try {
+      const response = await fetch('/api/confirm-payment', {
+        method: 'POST',
+        body: paymentData
+      });
+
+      if (response.ok) {
+        alert('Reçu envoyé ! Notre équipe validera votre accès sous 24h.');
+        setPurchased(false);
+        // Refresh access status
+        window.location.reload();
+      } else {
+        alert('Erreur lors de l\'envoi du reçu. Veuillez réessayer.');
+      }
+    } catch (error) {
+      console.error('Payment submission error:', error);
+      alert('Erreur lors de l\'envoi du reçu. Veuillez réessayer.');
     }
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsConnected(true);
-    setShowRegModal(false);
-    setPurchased(true);
+    
+    const formData = new FormData(e.target as HTMLFormElement);
+    const name = formData.get('name') + ' ' + formData.get('prenom');
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem('token', data.token);
+        setIsConnected(true);
+        setShowRegModal(false);
+        setPurchased(true);
+      } else {
+        alert(data.error || 'Registration failed');
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      alert('Registration failed');
+    }
   };
 
   // Update the workshop variable to use the Workshop type
-  const workshop: Workshop | undefined = getWorkshopById(Number(params.id));
-
   if (!workshop) {
     return (
       <div style={{ backgroundColor: '#091209', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontFamily: 'var(--font-inter), sans-serif' }}>
@@ -142,25 +242,51 @@ export default function WorkshopDetailPage({ params }: { params: { id: string } 
 
               {/* CTA Area */}
               <div>
-                {isConnected && purchased && !showRegModal ? (
-                  <div style={{ padding: '2.5rem', background: 'rgba(196,153,58,0.05)', border: '1px solid rgba(196,153,58,0.2)' }}>
-                    <p style={{ color: '#C4993A', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '1.5rem', letterSpacing: '0.1em' }}>✓ VOUS AVEZ ACCÈS À CE WORKSHOP</p>
-                    <a href="#curriculum" style={{
-                      display: 'inline-flex', alignItems: 'center', gap: '0.8rem', padding: '1.2rem 2rem', background: '#C4993A', color: 'white', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 'bold', letterSpacing: '0.15em', transition: 'all 0.3s'
-                    }}>
-                      🎥 COMMENCER LE CURRICULUM
-                    </a>
-                  </div>
-                ) : (
+                {!isConnected ? (
                   <button
-                    onClick={handlePurchaseClick}
+                    onClick={() => setShowRegModal(true)}
                     style={{
                       padding: '1.4rem 3rem', background: 'linear-gradient(135deg, #C4993A, #8B6820)',
                       border: 'none', color: 'white', fontSize: '0.9rem', letterSpacing: '0.2em', fontWeight: 'bold', borderRadius: '2px', cursor: 'pointer',
                       boxShadow: '0 15px 35px rgba(196,153,58,0.2)', transition: 'all 0.3s'
                     }}
                   >
-                    S'INSCRIRE ET PAYER — {workshop.price}
+                    S'INSCRIRE POUR ACCÉDER
+                  </button>
+                ) : hasAccess ? (
+                  <div style={{ padding: '2.5rem', background: 'rgba(196,153,58,0.05)', border: '1px solid rgba(196,153,58,0.2)' }}>
+                    <p style={{ color: '#C4993A', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '1.5rem', letterSpacing: '0.1em' }}>✓ VOUS AVEZ ACCÈS À CE WORKSHOP</p>
+                    {meetLink ? (
+                      <a href={meetLink} target="_blank" rel="noopener noreferrer" style={{
+                        display: 'inline-flex', alignItems: 'center', gap: '0.8rem', padding: '1.2rem 2rem', background: '#C4993A', color: 'white', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 'bold', letterSpacing: '0.15em', transition: 'all 0.3s'
+                      }}>
+                        🎥 REJOINDRE LA SÉANCE
+                      </a>
+                    ) : (
+                      <a href="#curriculum" style={{
+                        display: 'inline-flex', alignItems: 'center', gap: '0.8rem', padding: '1.2rem 2rem', background: '#C4993A', color: 'white', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 'bold', letterSpacing: '0.15em', transition: 'all 0.3s'
+                      }}>
+                        🎥 COMMENCER LE CURRICULUM
+                      </a>
+                    )}
+                  </div>
+                ) : purchaseStatus === 'pending' ? (
+                  <div style={{ padding: '2.5rem', background: 'rgba(255,165,0,0.05)', border: '1px solid rgba(255,165,0,0.2)' }}>
+                    <p style={{ color: '#FFA500', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '1.5rem', letterSpacing: '0.1em' }}>⏳ PAIEMENT EN COURS DE VALIDATION</p>
+                    <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.8rem', marginBottom: '1rem' }}>
+                      Votre reçu a été envoyé. L'équipe administrative validera votre paiement sous 24h.
+                    </p>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setPurchased(true)}
+                    style={{
+                      padding: '1.4rem 3rem', background: 'linear-gradient(135deg, #C4993A, #8B6820)',
+                      border: 'none', color: 'white', fontSize: '0.9rem', letterSpacing: '0.2em', fontWeight: 'bold', borderRadius: '2px', cursor: 'pointer',
+                      boxShadow: '0 15px 35px rgba(196,153,58,0.2)', transition: 'all 0.3s'
+                    }}
+                  >
+                    PROCÉDER AU PAIEMENT — {workshop.price}
                   </button>
                 )}
               </div>
@@ -202,13 +328,13 @@ export default function WorkshopDetailPage({ params }: { params: { id: string } 
                   </div>
                   <h4 style={{ fontSize: '1.2rem', fontWeight: '400', margin: '0 0 1.2rem', fontFamily: 'var(--font-cormorant)' }}>{module.title}</h4>
                   <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.5)', lineHeight: '1.6', marginBottom: '2rem', fontWeight: '300' }}>{module.description}</p>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', color: module.isLocked ? 'rgba(255,255,255,0.2)' : '#C4993A' }}>
-                    {module.isLocked ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', color: module.locked ? 'rgba(255,255,255,0.2)' : '#C4993A' }}>
+                    {module.locked ? (
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                     ) : (
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                     )}
-                    <span style={{ fontSize: '0.75rem', letterSpacing: '0.15em', fontWeight: 'bold' }}>{module.isLocked ? 'VERROUILLÉ' : 'REGARDER'}</span>
+                    <span style={{ fontSize: '0.75rem', letterSpacing: '0.15em', fontWeight: 'bold' }}>{module.locked ? 'VERROUILLÉ' : 'REGARDER'}</span>
                   </div>
                 </div>
               ))}
@@ -229,20 +355,20 @@ export default function WorkshopDetailPage({ params }: { params: { id: string } 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.2rem', marginBottom: '1.5rem' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.65rem', color: '#C4993A', letterSpacing: '0.15em', marginBottom: '0.6rem' }}>NOM</label>
-                  <input type="text" required style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(196,153,58,0.3)', padding: '1rem', color: 'white', outline: 'none' }} />
+                  <input name="name" type="text" required style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(196,153,58,0.3)', padding: '1rem', color: 'white', outline: 'none' }} />
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.65rem', color: '#C4993A', letterSpacing: '0.15em', marginBottom: '0.6rem' }}>PRÉNOM</label>
-                  <input type="text" required style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(196,153,58,0.3)', padding: '1rem', color: 'white', outline: 'none' }} />
+                  <input name="prenom" type="text" required style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(196,153,58,0.3)', padding: '1rem', color: 'white', outline: 'none' }} />
                 </div>
               </div>
               <div style={{ marginBottom: '1.5rem' }}>
                 <label style={{ display: 'block', fontSize: '0.65rem', color: '#C4993A', letterSpacing: '0.15em', marginBottom: '0.6rem' }}>EMAIL PROFESSIONNEL</label>
-                <input type="email" required style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(196,153,58,0.3)', padding: '1rem', color: 'white', outline: 'none' }} />
+                <input name="email" type="email" required style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(196,153,58,0.3)', padding: '1rem', color: 'white', outline: 'none' }} />
               </div>
               <div style={{ marginBottom: '1.8rem' }}>
                 <label style={{ display: 'block', fontSize: '0.65rem', color: '#C4993A', letterSpacing: '0.15em', marginBottom: '0.6rem' }}>MOT DE PASSE</label>
-                <input type="password" required style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(196,153,58,0.3)', padding: '1rem', color: 'white', outline: 'none' }} />
+                <input name="password" type="password" required style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(196,153,58,0.3)', padding: '1rem', color: 'white', outline: 'none' }} />
               </div>
               <button type="submit" style={{ width: '100%', padding: '1rem', background: '#C4993A', color: 'white', border: 'none', cursor: 'pointer', fontWeight: 'bold', letterSpacing: '0.2em', fontSize: '0.78rem' }}>
                 S'INSCRIRE ET CONTINUER
@@ -274,14 +400,14 @@ export default function WorkshopDetailPage({ params }: { params: { id: string } 
               </div>
             </div>
 
-            <form onSubmit={(e) => { e.preventDefault(); alert('Reçu envoyé ! Notre équipe validera votre accès sous 24h.'); setPurchased(false); }}>
+            <form onSubmit={handlePaymentSubmit}>
               <div style={{ marginBottom: '1.2rem' }}>
                 <label style={{ display: 'block', fontSize: '0.7rem', color: '#C4993A', letterSpacing: '0.1em', marginBottom: '0.6rem', fontWeight: '600' }}>CONFIRMER VOTRE EMAIL</label>
-                <input type="email" placeholder="votre@email.com" required style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(196,153,58,0.3)', padding: '0.8rem 0.9rem', color: 'white', outline: 'none' }} />
+                <input name="email" type="email" placeholder="votre@email.com" required style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(196,153,58,0.3)', padding: '0.8rem 0.9rem', color: 'white', outline: 'none' }} />
               </div>
               <div style={{ marginBottom: '1.8rem' }}>
                 <label style={{ display: 'block', fontSize: '0.7rem', color: '#C4993A', letterSpacing: '0.1em', marginBottom: '0.6rem', fontWeight: '600' }}>TÉLÉCHARGER LE REÇU (PDF/IMAGE)</label>
-                <input type="file" required style={{ width: '100%', color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem' }} />
+                <input name="receipt" type="file" accept=".pdf,.jpg,.jpeg,.png" required style={{ width: '100%', color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem' }} />
               </div>
               <button type="submit" style={{ width: '100%', padding: '1rem', background: '#C4993A', color: 'white', border: 'none', cursor: 'pointer', fontWeight: 'bold', letterSpacing: '0.18em', fontSize: '0.78rem' }}>
                 CONFIRMER MON PAIEMENT

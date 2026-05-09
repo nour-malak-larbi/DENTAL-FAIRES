@@ -4,10 +4,14 @@ import Link from 'next/link';
 import { mindshares, getMindshareById, getPosterUrl } from '@/lib/mindshares-data';
 
 export default function MindshareDetailPage({ params }: { params: { id: string } }) {
+  const [hasAccess, setHasAccess] = useState(false);
+  const [meetLink, setMeetLink] = useState<string | null>(null);
+  const [purchaseStatus, setPurchaseStatus] = useState<string | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [registered, setRegistered] = useState(false);
-  const [showRegModal, setShowRegModal] = useState(false);
+  const [mindshare, setMindshare] = useState<any>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [showRegModal, setShowRegModal] = useState(false);
+  const [registered, setRegistered] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -15,13 +19,55 @@ export default function MindshareDetailPage({ params }: { params: { id: string }
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleJoinClick = () => {
-    if (!isConnected) {
-      setShowRegModal(true);
-    } else {
-      setRegistered(true);
+  useEffect(() => {
+    // Fetch mindshare data
+    const fetchedMindshare = getMindshareById(Number(params.id));
+    setMindshare(fetchedMindshare);
+  }, [params.id]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      // Verify token
+      fetch('/api/auth/me', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.user) {
+          setIsConnected(true);
+          // Check access to this mindshare
+          if (mindshare) {
+            fetch('/api/access/check', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({
+                productType: 'mindshare',
+                productId: mindshare.id
+              })
+            })
+            .then(res => res.json())
+            .then(accessData => {
+              setHasAccess(accessData.hasAccess);
+              setMeetLink(accessData.meetLink);
+              setPurchaseStatus(accessData.purchaseStatus);
+            })
+            .catch(() => {
+              setHasAccess(false);
+            });
+          }
+        }
+      })
+      .catch(() => {
+        localStorage.removeItem('token');
+      });
     }
-  };
+  }, [mindshare]);
 
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,8 +75,6 @@ export default function MindshareDetailPage({ params }: { params: { id: string }
     setShowRegModal(false);
     setRegistered(true);
   };
-
-  const mindshare = getMindshareById(Number(params.id));
 
   if (!mindshare) {
     return (
@@ -133,28 +177,38 @@ export default function MindshareDetailPage({ params }: { params: { id: string }
               <h4 style={{ fontSize: '1.2rem', fontWeight: '300', marginBottom: '1rem' }}>Cet article vous a inspiré ?</h4>
               <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.5)', marginBottom: '2rem' }}>Rejoignez la discussion lors de nos sessions en direct sur Google Meet.</p>
               
-              {registered ? (
-                <a
-                  href="https://meet.google.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    display: 'inline-block', padding: '1rem 2.5rem', background: 'none', border: '1px solid #C4993A',
-                    color: '#C4993A', textDecoration: 'none', fontSize: '0.8rem', letterSpacing: '0.2em', fontWeight: 'bold'
-                  }}
-                >
-                  🎥 REJOINDRE GOOGLE MEET
-                </a>
-              ) : (
+              {!isConnected ? (
                 <button
-                  onClick={handleJoinClick}
+                  onClick={() => setShowRegModal(true)}
                   style={{
                     padding: '1rem 2.5rem', background: 'linear-gradient(135deg, #C4993A, #8B6820)',
                     border: 'none', color: 'white', fontSize: '0.8rem', letterSpacing: '0.2em', fontWeight: 'bold', cursor: 'pointer'
                   }}
                 >
-                  S'INSCRIRE À LA SESSION
+                  S'INSCRIRE POUR ACCÉDER
                 </button>
+              ) : hasAccess ? (
+                <div>
+                  <p style={{ color: '#C4993A', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '1.5rem', letterSpacing: '0.1em' }}>✓ VOUS AVEZ ACCÈS À CET ARTICLE</p>
+                  {meetLink ? (
+                    <a href={meetLink} target="_blank" rel="noopener noreferrer" style={{
+                      display: 'inline-flex', alignItems: 'center', gap: '0.8rem', padding: '1rem 2.5rem', background: '#C4993A', color: 'white', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 'bold', letterSpacing: '0.2em'
+                    }}>
+                      🎥 REJOINDRE LA DISCUSSION
+                    </a>
+                  ) : (
+                    <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.8rem' }}>
+                      Le lien Google Meet sera disponible prochainement.
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <div>
+                  <p style={{ color: '#C4993A', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '1.5rem', letterSpacing: '0.1em' }}>✓ ACCÈS GRATUIT À CET ARTICLE</p>
+                  <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.8rem', marginBottom: '1rem' }}>
+                    Connectez-vous pour accéder au contenu gratuit.
+                  </p>
+                </div>
               )}
             </div>
           </div>

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { verifyToken } from '@/lib/auth';
 
 export async function GET(
   request: Request,
@@ -7,7 +8,12 @@ export async function GET(
 ) {
   try {
     const workshop = await prisma.workshop.findUnique({
-      where: { id: params.id }
+      where: { id: params.id },
+      include: {
+        curriculum: {
+          orderBy: { order: 'asc' }
+        }
+      }
     });
     if (!workshop) {
       return NextResponse.json({ error: 'Workshop not found' }, { status: 404 });
@@ -23,6 +29,21 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
+    // Check authentication
+    const authUser = verifyToken(request);
+    if (!authUser) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Check if user is admin
+    const user = await prisma.user.findUnique({
+      where: { id: authUser.userId }
+    });
+
+    if (!user || user.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+    }
+
     const data = await request.json();
     const workshop = await prisma.workshop.update({
       where: { id: params.id },
@@ -37,7 +58,13 @@ export async function PUT(
         price: data.price,
         level: data.level,
         description: data.description,
-        posterFile: data.posterFile
+        posterFile: data.posterFile,
+        meetLink: data.meetLink
+      },
+      include: {
+        curriculum: {
+          orderBy: { order: 'asc' }
+        }
       }
     });
     return NextResponse.json(workshop);
@@ -51,6 +78,21 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    // Check authentication
+    const authUser = verifyToken(request);
+    if (!authUser) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Check if user is admin
+    const user = await prisma.user.findUnique({
+      where: { id: authUser.userId }
+    });
+
+    if (!user || user.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+    }
+
     await prisma.workshop.delete({
       where: { id: params.id }
     });

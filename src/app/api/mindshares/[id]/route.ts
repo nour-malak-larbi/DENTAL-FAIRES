@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { verifyToken } from '@/lib/auth';
 
 export async function GET(
   request: Request,
@@ -23,6 +24,12 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
+    // Check authentication
+    const authUser = verifyToken(request);
+    if (!authUser) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const data = await request.json();
     const mindshare = await prisma.mindshare.update({
       where: { id: params.id },
@@ -47,6 +54,12 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    // Check authentication
+    const authUser = verifyToken(request);
+    if (!authUser) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     await prisma.mindshare.delete({
       where: { id: params.id }
     });

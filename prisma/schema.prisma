@@ -14,6 +14,8 @@ model User {
   name      String?
   role      String   @default("USER")
   createdAt DateTime @default(now())
+  purchases Purchase[]
+  progress  UserProgress[]
 }
 
 model Webinar {
@@ -29,6 +31,7 @@ model Webinar {
   description     String
   posterFile      String?
   registrationUrl String?
+  meetLink        String?
   createdAt       DateTime @default(now())
 }
 
@@ -46,7 +49,20 @@ model Workshop {
   level           String?
   description     String
   posterFile      String?
+  meetLink        String?
+  curriculum      WorkshopModule[]
   createdAt       DateTime @default(now())
+}
+
+model WorkshopModule {
+  id          String   @id @default(cuid())
+  workshopId  String
+  workshop    Workshop @relation(fields: [workshopId], references: [id], onDelete: Cascade)
+  title       String
+  description String
+  duration    String
+  order       Int
+  createdAt   DateTime @default(now())
 }
 
 model Mindshare {
@@ -58,5 +74,30 @@ model Mindshare {
   content     String
   image       String?
   excerpt     String?
+  meetLink    String?
   createdAt   DateTime @default(now())
+}
+
+model Purchase {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productType   String   // 'workshop', 'webinar', 'mindshare', 'vip'
+  productId     String
+  amount        String
+  status        String   @default("pending") // 'pending', 'paid', 'rejected'
+  receiptFile   String?
+  adminNotes    String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model UserProgress {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  moduleId   String
+  completed  Boolean  @default(false)
+  completedAt DateTime?
+  createdAt  DateTime @default(now())
 }

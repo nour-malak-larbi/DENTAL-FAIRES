@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dental Fairies Academy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #061710;
+            --bg-dark: #030b08;
+            --gold: #d4af37;
+            --gold-light: #f4dfa1;
+            --gold-glow: rgba(212, 175, 55, 0.4);
+            --white: #ffffff;
+            --text-gray: #a6b8b0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--white);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .serif { font-family: 'Cormorant Garamond', serif; }
+
+        /* Background Scene */
+        .scene-container {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+            background: radial-gradient(circle at 55% 50%, #0d3323 0%, var(--bg-base) 60%);
+        }
+
+        .room-lines {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+        }
+
+        /* Floor Gradient Overlay */
+        .floor-light {
+            position: absolute;
+            bottom: 0; left: 0; width: 100%; height: 35%;
+            background: linear-gradient(to top, rgba(230,235,232,0.15), transparent);
+            clip-path: polygon(0 100%, 35% 0, 65% 0, 100% 100%);
+            z-index: 1;
+        }
+
+        /* Glowing Tooth */
+        .tooth-container {
+            position: absolute;
+            top: 50%; left: 55%;
+            transform: translate(-50%, -45%);
+            width: 320px; height: 400px;
+            z-index: 2;
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        .tooth-container svg {
+            width: 100%; height: 100%;
+            filter: drop-shadow(0 0 25px rgba(255,255,255,0.7)) drop-shadow(0 0 60px rgba(212, 175, 55, 0.4));
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -45%) scale(1); filter: brightness(1); }
+            50% { transform: translate(-50%, -45%) scale(1.02); filter: brightness(1.1); }
+        }
+
+        /* Navbar */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 2rem 5%; position: relative; z-index: 10;
+        }
+
+        .logo { display: flex; align-items: center; gap: 10px; }
+        .logo svg { width: 35px; height: 40px; fill: none; stroke: var(--gold-light); stroke-width: 1.5; }
+        .logo-text { line-height: 1.1; }
+        .logo-text .title { font-size: 1.4rem; font-weight: 500; color: var(--white); }
+        .logo-text .subtitle { font-size: 1.1rem; font-family: 'Inter', sans-serif; font-weight: 300; }
+
+        .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+        .nav-links a { 
+            color: var(--white); text-decoration: none; font-size: 0.9rem; 
+            opacity: 0.8; transition: 0.3s; 
+        }
+        .nav-links a:hover, .nav-links a.active { color: var(--gold-light); opacity: 1; }
+        .nav-links a.active { border-bottom: 1px solid var(--gold-light); padding-bottom: 3px; }
+
+        .nav-actions { display: flex; align-items: center; gap: 2rem; }
+        .nav-actions a { color: var(--white); text-decoration: none; font-size: 0.9rem; }
+        .btn-enroll {
+            border: 1px solid var(--gold); padding: 0.6rem 1.5rem; border-radius: 4px;
+            color: var(--gold-light) !important; transition: 0.3s;
+        }
+        .btn-enroll:hover { background: var(--gold); color: var(--bg-base) !important; }
+
+        /* Hero */
+        .hero { position: relative; z-index: 10; padding: 10rem 5% 4rem; max-width: 600px; }
+        .hero h1 { font-size: 3.5rem; line-height: 1.15; margin-bottom: 1.5rem; }
+        .hero h1 .gold-text { color: var(--gold-light); }
+        .hero h1 .white-text { color: var(--white); }
+        
+        .hero p { font-size: 1.05rem; color: var(--white); margin-bottom: 3rem; line-height: 1.6; max-width: 450px; opacity: 0.9; }
+
+        .hero-btns { display: flex; gap: 1.5rem; }
+        .btn-bracket {
+            background: transparent; border: 1px solid rgba(212, 175, 55, 0.5);
+            color: var(--gold-light); padding: 0.8rem 1.8rem; font-size: 0.9rem;
+            cursor: pointer; transition: 0.3s; font-family: 'Inter', sans-serif;
+            position: relative;
+        }
+        .btn-bracket::before, .btn-bracket::after {
+            content: ''; position: absolute; width: 6px; height: 100%; top: 0;
+            border: 1px solid var(--gold); transition: 0.3s;
+        }
+        .btn-bracket::before { left: 0; border-right: none; }
+        .btn-bracket::after { right: 0; border-left: none; }
+        .btn-bracket:hover { background: rgba(212, 175, 55, 0.1); border-color: var(--gold); }
+
+        /* Main Content */
+        .content-section {
+            position: relative; z-index: 10; text-align: center;
+            background: linear-gradient(to bottom, transparent, var(--bg-dark) 20%);
+            padding: 8rem 5% 5rem;
+            margin-top: 5vh;
+        }
+        
+        .tagline { font-size: 2.2rem; color: var(--white); margin-bottom: 4rem; line-height: 1.3; font-weight: 500; }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; max-width: 1200px; margin: 0 auto;
+        }
+
+        .feature-card {
+            background: linear-gradient(145deg, rgba(10,35,25,0.7), rgba(5,15,10,0.9));
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            border-radius: 12px; padding: 2rem 1.5rem; text-align: left;
+            position: relative; overflow: hidden; backdrop-filter: blur(10px);
+            transition: 0.4s; display: flex; align-items: flex-start; gap: 1.2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        
+        .feature-card::before, .feature-card::after {
+            content: ''; position: absolute; left: 10%; width: 80%; height: 1px;
+            background: radial-gradient(circle, rgba(212,175,55,0.8) 0%, transparent 100%); opacity: 0.3; transition: 0.4s;
+        }
+        .feature-card::before { top: 0; }
+        .feature-card::after { bottom: 0; }
+        
+        .feature-card:hover { transform: translateY(-5px); border-color: rgba(212, 175, 55, 0.4); box-shadow: 0 15px 40px rgba(0,0,0,0.7), inset 0 0 20px rgba(212, 175, 55, 0.05); }
+        .feature-card:hover::before, .feature-card:hover::after { opacity: 1; }
+
+        .card-icon { width: 35px; height: 35px; flex-shrink: 0; stroke: var(--white); fill: none; stroke-width: 1.5; }
+
+        .card-content h3 { font-size: 1rem; color: var(--white); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; line-height: 1.4; }
+        .card-content p { font-size: 0.85rem; color: var(--text-gray); line-height: 1.5; }
+
+        /* Footer */
+        footer { padding: 3rem 5%; background: var(--bg-dark); position: relative; }
+        .footer-line { position: absolute; top: 0; left: 5%; right: 5%; height: 1px; background: linear-gradient(90deg, transparent 0%, rgba(212,175,55,0.3) 50%, transparent 100%); }
+        
+        .footer-crest { position: absolute; left: 50%; top: 0; transform: translate(-50%, -50%); background: var(--bg-dark); padding: 0 20px; }
+        .footer-crest svg { width: 50px; height: 50px; fill: none; stroke: var(--gold); stroke-width: 1; filter: drop-shadow(0 0 5px rgba(212,175,55,0.3)); }
+
+        .footer-content { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; }
+        .footer-links { display: flex; gap: 2rem; }
+        .footer-links a, .copyright { color: var(--text-gray); text-decoration: none; font-size: 0.85rem; }
+        .footer-links a:hover { color: var(--gold); }
+
+        /* Animations */
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-up { animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+        .d-1 { animation-delay: 0.1s; } .d-2 { animation-delay: 0.3s; } .d-3 { animation-delay: 0.5s; } .d-4 { animation-delay: 0.7s; }
+
+        @media (max-width: 900px) {
+            .cards-grid { grid-template-columns: 1fr; }
+            .hero { padding-top: 5rem; text-align: center; margin: 0 auto; }
+            .tooth-container { opacity: 0.3; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Scene Background -->
+    <div class="scene-container">
+        <!-- Structural Lines for Corridor -->
+        <svg class="room-lines" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <!-- Left Wall Paneling -->
+            <path d="M 15 0 L 15 100 M 25 0 L 25 100" stroke="rgba(212, 175, 55, 0.15)" stroke-width="0.2"/>
+            <path d="M 5 0 L 5 100" stroke="rgba(212, 175, 55, 0.05)" stroke-width="0.1"/>
+            
+            <!-- Perspective Lines -->
+            <line x1="0" y1="0" x2="35" y2="25" stroke="rgba(212, 175, 55, 0.2)" stroke-width="0.3"/>
+            <line x1="0" y1="100" x2="35" y2="75" stroke="rgba(212, 175, 55, 0.2)" stroke-width="0.3"/>
+            <line x1="35" y1="25" x2="35" y2="75" stroke="rgba(212, 175, 55, 0.2)" stroke-width="0.3"/>
+            
+            <line x1="100" y1="0" x2="65" y2="25" stroke="rgba(212, 175, 55, 0.2)" stroke-width="0.3"/>
+            <line x1="100" y1="100" x2="65" y2="75" stroke="rgba(212, 175, 55, 0.2)" stroke-width="0.3"/>
+            
+            <!-- Right Archway Door -->
+            <defs>
+                <linearGradient id="archGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#ffffff"/>
+                    <stop offset="100%" stop-color="#f4dfa1" stop-opacity="0.8"/>
+                </linearGradient>
+            </defs>
+            <path d="M 75 79 L 75 35 Q 75 25 85 25 Q 95 25 95 35 L 95 91 Z" fill="url(#archGrad)" style="filter: drop-shadow(0 0 8px #fff) drop-shadow(-5px 0 15px rgba(212,175,55,0.5));"/>
+            <!-- Inner Arch glow -->
+            <path d="M 78 79 L 78 35 Q 78 28 85 28 Q 92 28 92 35 L 92 88 Z" fill="#ffffff" style="filter: blur(2px);"/>
+        </svg>
+
+        <div class="floor-light"></div>
+
+        <div class="tooth-container">
+            <svg viewBox="0 0 100 120">
+                <path d="M25,20 C25,-5 75,-5 75,20 C75,40 85,55 85,75 C85,100 70,115 55,95 C50,85 50,85 45,95 C30,115 15,100 15,75 C15,55 25,40 25,20 Z" 
+                      fill="rgba(255,255,255,0.02)" stroke="#fff" stroke-width="1.5" />
+                <path d="M25,20 C25,-5 75,-5 75,20 C75,40 85,55 85,75 C85,100 70,115 55,95 C50,85 50,85 45,95 C30,115 15,100 15,75 C15,55 25,40 25,20 Z" 
+                      fill="none" stroke="var(--gold)" stroke-width="0.5" stroke-dasharray="4 2" opacity="0.8"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="animate-up">
+        <div class="logo">
+            <svg viewBox="0 0 24 24">
+                <path d="M7 4c0-2.2 10-2.2 10 0 0 2.2 2 3.8 2 6 0 2.8-2 4.2-4 2.2-.6-.6-1.4-.6-2 0-2 2.2-4 .8-4-2.2 0-2.2 2-3.8 2-6z" stroke-linejoin="round"/>
+                <path d="M8 2l1 2M6 4l1 1" stroke-width="1"/>
+            </svg>
+            <div class="logo-text">
+                <span class="title serif">Dental Fairies</span><br>
+                <span class="subtitle">Academy</span>
+            </div>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#" class="active">Home</a></li>
+            <li><a href="#">Courses</a></li>
+            <li><a href="#">Faculty</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Apply</a></li>
+        </ul>
+        <div class="nav-actions">
+            <a href="#">Login</a>
+            <a href="#" class="btn-enroll">Enroll Now</a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <h1 class="serif animate-up d-1">
+            <span class="gold-text">ACCREDITED</span><br>
+            <span class="gold-text">DENTAL EXCELLENCE.</span><br>
+            <span class="white-text">ELEVATE YOUR CAREER.</span>
+        </h1>
+        <p class="animate-up d-2">
+            Explore our premier medical education platform for advanced dental professionals worldwide.
+        </p>
+        <div class="hero-btns animate-up d-3">
+            <button class="btn-bracket">[Explore Our Programs]</button>
+            <button class="btn-bracket">[Join The Academy]</button>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="content-section">
+        <h2 class="tagline serif animate-up">
+            Transforming Dental Education through<br>Innovation and Expertise.
+        </h2>
+
+        <div class="cards-grid animate-up d-1">
+            <!-- Card 1 -->
+            <div class="feature-card">
+                <svg class="card-icon" viewBox="0 0 24 24">
+                    <path d="M7 4c0-2.2 10-2.2 10 0 0 2.2 2 3.8 2 6 0 2.8-2 4.2-4 2.2-.6-.6-1.4-.6-2 0-2 2.2-4 .8-4-2.2 0-2.2 2-3.8 2-6z" stroke-linejoin="round"/>
+                    <path d="M16 4l2-2m-2 4l2 2" stroke-width="1.5" stroke="var(--gold-light)"/>
+                </svg>
+                <div class="card-content">
+                    <h3>ADVANCED COSMETIC<br>DENTISTRY</h3>
+                    <p>Master aesthetic techniques & design smiles.</p>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="feature-card">
+                <svg class="card-icon" viewBox="0 0 24 24">
+                    <rect x="9" y="3" width="6" height="4" rx="1"/>
+                    <path d="M7 7h10v6a5 5 0 0 1-10 0V7z"/>
+                    <path d="M11 13v8M13 13v8"/>
+                    <path d="M10 16h4M10 19h4"/>
+                </svg>
+                <div class="card-content">
+                    <h3>IMPLANTOLOGY &<br>ORAL SURGERY</h3>
+                    <p>Specialized training for complex procedures.</p>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="feature-card">
+                <svg class="card-icon" viewBox="0 0 24 24">
+                    <rect x="3" y="4" width="18" height="12" rx="2"/>
+                    <path d="M8 20h8M12 16v4"/>
+                    <path d="M18 8l2 2-2 2" stroke="var(--gold-light)" stroke-width="1"/>
+                </svg>
+                <div class="card-content">
+                    <h3>DIGITAL DENTAL<br>WORKFLOWS</h3>
+                    <p>Embrace cutting-edge technology & practice.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-line"></div>
+        <div class="footer-crest">
+            <svg viewBox="0 0 100 100">
+                <path d="M50 10 L80 30 L80 60 Q80 90 50 95 Q20 90 20 60 L20 30 Z" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M35 45 L65 45 M50 30 L50 75" stroke="currentColor" stroke-width="1"/>
+                <circle cx="50" cy="50" r="10" fill="none" stroke="var(--gold-light)"/>
+                <path d="M40 10 Q50 0 60 10" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+        </div>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#">Legal</a>
+                <a href="#">Contact</a>
+            </div>
+            <div class="copyright">
+                Copyright &copy; 2024
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

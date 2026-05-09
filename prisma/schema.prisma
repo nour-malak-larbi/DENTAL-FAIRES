@@ -1,0 +1,62 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      String   @default("USER")
+  createdAt DateTime @default(now())
+}
+
+model Webinar {
+  id              String   @id @default(cuid())
+  title           String
+  subtitle        String?
+  category        String
+  categoryLabel   String?
+  date            String
+  duration        String?
+  speaker         String
+  speakerTitle    String?
+  description     String
+  posterFile      String?
+  registrationUrl String?
+  createdAt       DateTime @default(now())
+}
+
+model Workshop {
+  id              String   @id @default(cuid())
+  title           String
+  subtitle        String?
+  category        String
+  categoryLabel   String?
+  date            String?
+  duration        String?
+  instructor      String
+  instructorTitle String?
+  price           String?
+  level           String?
+  description     String
+  posterFile      String?
+  createdAt       DateTime @default(now())
+}
+
+model Mindshare {
+  id          String   @id @default(cuid())
+  title       String
+  category    String
+  date        String
+  author      String
+  content     String
+  image       String?
+  excerpt     String?
+  createdAt   DateTime @default(now())
+}

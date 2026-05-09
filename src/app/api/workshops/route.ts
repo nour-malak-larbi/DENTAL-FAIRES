@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { verifyToken } from '@/lib/auth';
+import { isAdmin } from '@/lib/auth';
 
 export async function GET(request: Request) {
   try {
@@ -20,18 +20,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    // Check authentication
-    const authUser = verifyToken(request);
-    if (!authUser) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Check if user is admin
-    const user = await prisma.user.findUnique({
-      where: { id: authUser.userId }
-    });
-
-    if (!user || user.role !== 'ADMIN') {
+    if (!isAdmin(request)) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 

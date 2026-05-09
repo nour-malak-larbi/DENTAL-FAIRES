@@ -1,3 +1,5 @@
+import { ReactNode } from 'react';
+
 export interface Workshop {
   id: number;
   title: string;
@@ -14,7 +16,7 @@ export interface Workshop {
   description: string;
   objectives: string[];
   curriculum: {
-    description: ReactNode;
+    description?: ReactNode;
     title: string;
     duration: string;
     locked: boolean;

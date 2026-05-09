@@ -13,6 +13,7 @@ export default function WorkshopDetailPage({ params }: { params: { id: string } 
   const [purchased, setPurchased] = useState(false);
   const [showRegModal, setShowRegModal] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [imgLoaded, setImgLoaded] = useState(false);
 
   useEffect(() => {
     // Fetch workshop data

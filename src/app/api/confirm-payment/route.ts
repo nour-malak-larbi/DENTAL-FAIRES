@@ -10,23 +10,32 @@ export async function POST(request: Request) {
   try {
     const formData = await request.formData();
 
-    const name = formData.get('name') as string;
-    const email = formData.get('email') as string;
-    const phone = formData.get('phone') as string;
-    const productTitle = formData.get('productTitle') as string;
+    let name = formData.get('name') as string;
+    let email = formData.get('email') as string;
+    const phone = formData.get('phone') as string || 'N/A';
+    const productTitle = formData.get('productTitle') as string || 'Formation';
     const productId = formData.get('productId') as string;
     const productType = formData.get('productType') as string;
-    const amount = formData.get('amount') as string;
-    const file = formData.get('file') as File;
+    const amount = formData.get('amount') as string || 'N/A';
+    const file = (formData.get('file') || formData.get('receipt')) as File;
 
     if (!file) {
-      return NextResponse.json({ error: 'Fichier manquant' }, { status: 400 });
+      return NextResponse.json({ error: 'Fichier manquant (envoyez via "file" ou "receipt")' }, { status: 400 });
     }
 
     // Check authentication
     const authUser = verifyToken(request);
     if (!authUser) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // If name/email missing, try to get from DB
+    if (!name || !email) {
+      const user = await prisma.user.findUnique({ where: { id: authUser.userId } });
+      if (user) {
+        name = name || user.name;
+        email = email || user.email;
+      }
     }
 
     // Convert file to arrayBuffer for Resend attachment

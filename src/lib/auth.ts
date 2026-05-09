@@ -6,6 +6,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 export interface AuthUser {
   userId: string;
   email: string;
+  role: string;
 }
 
 export function verifyToken(request: Request | NextRequest): AuthUser | null {
@@ -23,6 +24,11 @@ export function verifyToken(request: Request | NextRequest): AuthUser | null {
     console.error('Token verification failed:', error);
     return null;
   }
+}
+
+export function isAdmin(request: Request | NextRequest): boolean {
+  const user = verifyToken(request);
+  return user?.role === 'ADMIN';
 }
 
 export function generateToken(user: AuthUser): string {

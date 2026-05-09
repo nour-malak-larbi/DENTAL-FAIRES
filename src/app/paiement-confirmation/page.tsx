@@ -1,9 +1,9 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
-export default function PaymentConfirmationPage() {
+function PaymentConfirmationContent() {
   const searchParams = useSearchParams();
   const productId = searchParams.get('id');
   const productTitle = searchParams.get('title');
@@ -280,5 +280,17 @@ export default function PaymentConfirmationPage() {
         </footer>
       </div>
     </main>
+  );
+}
+
+export default function PaymentConfirmationPage() {
+  return (
+    <Suspense fallback={
+      <div style={{ backgroundColor: '#091209', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
+        <p>Chargement...</p>
+      </div>
+    }>
+      <PaymentConfirmationContent />
+    </Suspense>
   );
 }

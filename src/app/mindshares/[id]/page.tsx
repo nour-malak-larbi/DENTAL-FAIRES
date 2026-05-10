@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { mindshares, getMindshareById, getPosterUrl } from '@/lib/mindshares-data';
+
 
 import Navbar from '@/components/Navbar';
 
@@ -23,14 +23,11 @@ export default function MindshareDetailPage({ params }: { params: { id: string }
           const data = await res.json();
           setMindshare(data);
         } else {
-          // Fallback to static if not found or error
-          const fetchedMindshare = getMindshareById(Number(params.id));
-          setMindshare(fetchedMindshare);
+          setMindshare(null);
         }
       } catch (err) {
         console.error('Failed to fetch mindshare:', err);
-        const fetchedMindshare = getMindshareById(Number(params.id));
-        setMindshare(fetchedMindshare);
+        setMindshare(null);
       }
     };
     fetchMindshare();

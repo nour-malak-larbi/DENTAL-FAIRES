@@ -24,14 +24,11 @@ export default function WebinarDetailPage({ params }: { params: { id: string } }
           const data = await res.json();
           setWebinar(data);
         } else {
-          // Fallback to static if not found or error
-          const fetchedWebinar = getWebinarById(Number(params.id));
-          setWebinar(fetchedWebinar);
+          setWebinar(null);
         }
       } catch (err) {
         console.error('Failed to fetch webinar:', err);
-        const fetchedWebinar = getWebinarById(Number(params.id));
-        setWebinar(fetchedWebinar);
+        setWebinar(null);
       }
     };
     fetchWebinar();

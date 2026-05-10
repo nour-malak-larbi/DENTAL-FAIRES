@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { workshops, getWorkshopById, getWorkshopPosterUrl } from '@/lib/workshops-data';
+
 import { Workshop } from '@/lib/workshops-data';
 
 import Navbar from '@/components/Navbar';
@@ -25,14 +25,11 @@ export default function WorkshopDetailPage({ params }: { params: { id: string } 
           const data = await res.json();
           setWorkshop(data);
         } else {
-          // Fallback to static if not found or error
-          const fetchedWorkshop = getWorkshopById(Number(params.id));
-          setWorkshop(fetchedWorkshop);
+          setWorkshop(null);
         }
       } catch (err) {
         console.error('Failed to fetch workshop:', err);
-        const fetchedWorkshop = getWorkshopById(Number(params.id));
-        setWorkshop(fetchedWorkshop);
+        setWorkshop(null);
       }
     };
     fetchWorkshop();

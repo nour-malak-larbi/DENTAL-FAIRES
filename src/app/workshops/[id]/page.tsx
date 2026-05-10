@@ -173,7 +173,7 @@ export default function WorkshopDetailPage({ params }: { params: { id: string } 
                 background: '#0D140D', aspectRatio: '1/1'
               }}>
                 <img 
-                  src={workshop.posterFile ? getWorkshopPosterUrl(workshop.posterFile) : (workshop.image || '/logo-transparent.png')} 
+                  src={workshop.posterFile || workshop.image || '/logo-transparent.png'}
                   alt={workshop.title}
                   onLoad={() => setImgLoaded(true)}
                   style={{ 

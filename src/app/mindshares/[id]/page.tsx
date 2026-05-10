@@ -120,7 +120,7 @@ export default function MindshareDetailPage({ params }: { params: { id: string }
         {/* Left: Sticky Poster */}
         <div style={{ flex: '1', minWidth: '320px', position: 'relative', height: 'clamp(300px, 50vh, 100vh)', overflow: 'hidden' }}>
           <img 
-            src={mindshare.posterFile ? getPosterUrl(mindshare.posterFile) : (mindshare.image || '/logo-transparent.png')} 
+            src={mindshare.posterFile || mindshare.image || '/logo-transparent.png'}
             alt={mindshare.title}
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />

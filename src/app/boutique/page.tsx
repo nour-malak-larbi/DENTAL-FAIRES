@@ -7,17 +7,10 @@ export default function BoutiquePage() {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Placeholder: no products yet
   useEffect(() => {
-    fetch('/api/products')
-      .then(res => res.json())
-      .then(data => {
-        setProducts(data || []);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-      });
+    // Simulate loading delay if desired
+    setLoading(false);
   }, []);
 
   return (
@@ -35,7 +28,7 @@ export default function BoutiquePage() {
           fontFamily: "'Cormorant Garamond', serif",
           lineHeight: '0.9'
         }}>
-          La <span style={{ color: '#C4993A', fontStyle: 'italic' }}>Boutique</span>
+          Le <span style={{ color: '#C4993A', fontStyle: 'italic' }}>Comptoir Dentaire</span>
         </h1>
         <p style={{ maxWidth: '800px', margin: '0 auto', fontSize: '1.1rem', color: 'rgba(245,242,236,0.5)', fontWeight: '300', lineHeight: '1.8' }}>
           Une sélection rigoureuse de produits dentaires d'excellence pour accompagner votre quête de perfection clinique.
@@ -83,7 +76,7 @@ export default function BoutiquePage() {
               background: '#0D140D', border: '1px solid rgba(196,153,58,0.12)' 
             }}>
               <h2 style={{ fontSize: '2.5rem', fontWeight: '200', letterSpacing: '0.05em', marginBottom: '1.5rem', fontFamily: "'Cormorant Garamond', serif" }}>Le catalogue arrive bientôt</h2>
-              <p style={{ color: 'rgba(245,242,236,0.4)', marginBottom: '4rem' }}>Soyez informé dès l'ouverture de la boutique d'excellence.</p>
+              <p style={{ color: 'rgba(245,242,236,0.4)', marginBottom: '4rem' }}>Soyez informé dès l'ouverture du comptoir d'excellence.</p>
               <div style={{ maxWidth: '500px', margin: '0 auto', display: 'flex', gap: '0', border: '1px solid rgba(196,153,58,0.3)', padding: '0.5rem', borderRadius: '2px' }}>
                 <input type="email" placeholder="Votre adresse email" style={{ flex: 1, background: 'none', border: 'none', padding: '1rem', color: 'white', outline: 'none', fontSize: '0.9rem' }} />
                 <button style={{ padding: '0 2rem', background: '#C4993A', border: 'none', color: '#0A0F0A', fontWeight: '800', fontSize: '0.7rem', letterSpacing: '0.2em', cursor: 'pointer' }}>S'INSCRIRE</button>

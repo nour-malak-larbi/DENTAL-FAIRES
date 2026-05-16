@@ -29,13 +29,15 @@ export default function Navbar() {
   }, []);
 
   const navLinks = [
-    { name: 'Accueil', href: '/' },
-    { name: 'Webinaires', href: '/webinaires' },
-    { name: 'Mindshares', href: '/mindshares' },
-    { name: 'Workshops', href: '/workshops' },
     { name: 'Podcasts', href: '/podcasts' },
+    { name: 'Comptoir Dentaire', href: '/boutique' }
+  ];
+
+  const academieLinks = [
+    { name: 'Webinaires', href: '/webinaires' },
+    { name: 'Workshops', href: '/workshops' },
     { name: 'Coaching VIP', href: '/vip' },
-    { name: 'Boutique', href: '/boutique' },
+    { name: 'Mindshares', href: '/mindshares' },
   ];
 
   return (
@@ -68,6 +70,31 @@ export default function Navbar() {
 
         {/* Desktop Links */}
         <ul className="nav-links desktop-only">
+          {/* Dropdown for Côté Académique placed first (left) */}
+          <li className="dropdown-container" style={{ position: 'relative', padding: '10px 0', order: -1 }}>
+            <span style={{ 
+              color: academieLinks.some(l => pathname === l.href) ? '#F1D382' : 'rgba(245,242,236,0.55)',
+              fontWeight: academieLinks.some(l => pathname === l.href) ? '600' : '300',
+              fontSize: '0.62rem',
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px'
+            }}>
+              Côté Académique
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9l6 6 6-6"/></svg>
+            </span>
+            <div className="dropdown-menu">
+              {academieLinks.map(link => (
+                <Link key={link.href} href={link.href} className="dropdown-item">
+                  {link.name}
+                </Link>
+              ))}
+            </div>
+          </li>
+
           {navLinks.map((link) => (
             <li key={link.href}>
               <Link 
@@ -83,6 +110,7 @@ export default function Navbar() {
               </Link>
             </li>
           ))}
+
           {isConnected && (
             <li key="/profile">
               <Link 
@@ -133,6 +161,31 @@ export default function Navbar() {
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
           gap: '2rem'
         }}>
+          <div style={{ textAlign: 'center', marginTop: '1rem', marginBottom: '1rem' }}>
+            <span style={{ 
+              color: academieLinks.some(l => pathname === l.href) ? '#F1D382' : 'white',
+              fontSize: '1.2rem', textTransform: 'uppercase', letterSpacing: '0.2em', textDecoration: 'none',
+              display: 'block', marginBottom: '1rem'
+            }}>
+              Côté Académique
+            </span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {academieLinks.map((link) => (
+                <Link 
+                  key={link.href}
+                  href={link.href} 
+                  onClick={() => setIsMenuOpen(false)}
+                  style={{ 
+                    color: pathname === link.href ? '#F1D382' : 'rgba(245,242,236,0.7)',
+                    fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.15em', textDecoration: 'none'
+                  }}
+                >
+                  {link.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+
           {navLinks.map((link) => (
             <Link 
               key={link.href}
@@ -214,6 +267,49 @@ export default function Navbar() {
         .nav-btn:hover {
           background: #C4993A;
           color: #091209;
+        }
+        
+        .dropdown-menu {
+          position: absolute;
+          top: 100%;
+          left: 50%;
+          transform: translateX(-50%) translateY(10px);
+          background: rgba(9, 18, 9, 0.95);
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(212,175,55,0.2);
+          padding: 1rem 0;
+          min-width: 180px;
+          display: flex;
+          flex-direction: column;
+          opacity: 0;
+          visibility: hidden;
+          transition: all 0.3s ease;
+          border-radius: 4px;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        
+        .dropdown-container:hover .dropdown-menu {
+          opacity: 1;
+          visibility: visible;
+          transform: translateX(-50%) translateY(0);
+        }
+        
+        .dropdown-item {
+          padding: 0.6rem 1.5rem;
+          color: rgba(245,242,236,0.7);
+          font-size: 0.62rem;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          text-decoration: none;
+          transition: all 0.3s ease;
+          display: block;
+          white-space: nowrap;
+        }
+        
+        .dropdown-item:hover {
+          color: #F1D382 !important;
+          background: rgba(212,175,55,0.05);
+          padding-left: 1.8rem;
         }
 
         @media (max-width: 1200px) {

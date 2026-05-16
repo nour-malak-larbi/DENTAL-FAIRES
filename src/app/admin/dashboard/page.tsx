@@ -72,7 +72,7 @@ export default function AdminDashboard() {
     { id: 'mindshares', label: 'Mindshares', icon: '📝' },
     { id: 'workshops', label: 'Workshops', icon: '🛠' },
     { id: 'vip', label: 'Coaching VIP', icon: '💎' },
-    { id: 'products', label: 'Boutique', icon: '🛒' },
+    { id: 'products', label: 'Comptoir Dentaire', icon: '🛒' },
     { id: 'settings', label: 'Paramètres', icon: '⚙' },
   ];
 
@@ -433,7 +433,7 @@ export default function AdminDashboard() {
                   { label: 'Workshops', count: items.workshops.length, icon: '🛠' },
                   { label: 'Mindshares', count: items.mindshares.length, icon: '📝' },
                   { label: 'Coaching VIP', count: items.vip.length, icon: '💎' },
-                  { label: 'Boutique', count: items.products.length, icon: '🛒' },
+                  { label: 'Comptoir Dentaire', count: items.products.length, icon: '🛒' },
                 ].map(stat => (
                   <div key={stat.label} style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(196,153,58,0.1)', padding: '2.5rem', textAlign: 'center' }}>
                     <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>{stat.icon}</div>

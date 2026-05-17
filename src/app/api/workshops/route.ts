@@ -13,8 +13,12 @@ export async function GET(request: Request) {
       orderBy: { createdAt: 'desc' }
     });
     return NextResponse.json(workshops);
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch workshops' }, { status: 500 });
+  } catch (error: any) {
+    console.error('API /api/workshops error:', error);
+    return NextResponse.json({ 
+      error: 'Failed to fetch workshops', 
+      details: error.message || String(error)
+    }, { status: 500 });
   }
 }
 

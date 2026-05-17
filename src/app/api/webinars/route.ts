@@ -8,8 +8,12 @@ export async function GET() {
       orderBy: { createdAt: 'desc' }
     });
     return NextResponse.json(webinars);
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch webinars' }, { status: 500 });
+  } catch (error: any) {
+    console.error('API /api/webinars error:', error);
+    return NextResponse.json({ 
+      error: 'Failed to fetch webinars', 
+      details: error.message || String(error)
+    }, { status: 500 });
   }
 }
 

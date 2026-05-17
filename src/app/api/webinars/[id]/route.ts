@@ -13,8 +13,12 @@ export async function GET(
       return NextResponse.json({ error: 'Webinar not found' }, { status: 404 });
     }
     return NextResponse.json(webinar);
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch webinar' }, { status: 500 });
+  } catch (error: any) {
+    console.error(`API /api/webinars/${params.id} error:`, error);
+    return NextResponse.json({ 
+      error: 'Failed to fetch webinar', 
+      details: error.message || String(error)
+    }, { status: 500 });
   }
 }
 

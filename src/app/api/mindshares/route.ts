@@ -8,8 +8,12 @@ export async function GET() {
       orderBy: { createdAt: 'desc' }
     });
     return NextResponse.json(mindshares);
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch mindshares' }, { status: 500 });
+  } catch (error: any) {
+    console.error('API /api/mindshares error:', error);
+    return NextResponse.json({ 
+      error: 'Failed to fetch mindshares', 
+      details: error.message || String(error)
+    }, { status: 500 });
   }
 }
 

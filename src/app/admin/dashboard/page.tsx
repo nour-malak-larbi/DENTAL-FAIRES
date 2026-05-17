@@ -33,22 +33,20 @@ export default function AdminDashboard() {
         fetch('/api/settings')
       ]);
 
-      const [webinars, workshops, mindshares, vip, products, settings] = await Promise.all([
-        webinarsRes.json(),
-        workshopsRes.json(),
-        mindsharesRes.json(),
-        vipRes.json(),
-        productsRes.json(),
-        settingsRes.json()
-      ]);
+      const webinars = webinarsRes.ok ? await webinarsRes.json().catch(() => []) : [];
+      const workshops = workshopsRes.ok ? await workshopsRes.json().catch(() => []) : [];
+      const mindshares = mindsharesRes.ok ? await mindsharesRes.json().catch(() => []) : [];
+      const vip = vipRes.ok ? await vipRes.json().catch(() => []) : [];
+      const products = productsRes.ok ? await productsRes.json().catch(() => []) : [];
+      const settings = settingsRes.ok ? await settingsRes.json().catch(() => ({ ccp: '', rip: '' })) : { ccp: '', rip: '' };
 
       setItems({
-        webinaires: webinars || [],
-        workshops: workshops || [],
-        mindshares: mindshares || [],
-        vip: vip || [],
-        products: products || [],
-        settings: settings || { ccp: '', rip: '' },
+        webinaires: Array.isArray(webinars) ? webinars : [],
+        workshops: Array.isArray(workshops) ? workshops : [],
+        mindshares: Array.isArray(mindshares) ? mindshares : [],
+        vip: Array.isArray(vip) ? vip : [],
+        products: Array.isArray(products) ? products : [],
+        settings: (settings && !settings.error) ? settings : { ccp: '', rip: '' },
       });
     } catch (error) {
       console.error('Failed to fetch items:', error);

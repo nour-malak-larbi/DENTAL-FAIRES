@@ -392,6 +392,12 @@ export default function AdminDashboard() {
                     <label style={{ fontSize: '0.65rem', color: '#C4993A', letterSpacing: '0.2em' }}>INTERVENANT</label>
                     <input type="text" value={editingItem.speaker || editingItem.author || editingItem.instructor || ''} onChange={e => setEditingItem({...editingItem, speaker: e.target.value, author: e.target.value, instructor: e.target.value})} style={{ background: 'rgba(17,26,17,0.8)', border: '1px solid rgba(196,153,58,0.2)', padding: '1rem', color: 'white', outline: 'none' }} />
                   </div>
+                  {activeTab === 'workshops' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                      <label style={{ fontSize: '0.65rem', color: '#C4993A', letterSpacing: '0.2em' }}>PRIX (e.g. 5000 DZD)</label>
+                      <input type="text" value={editingItem.price || ''} onChange={e => setEditingItem({...editingItem, price: e.target.value})} placeholder="5000 DZD" style={{ background: 'rgba(17,26,17,0.8)', border: '1px solid rgba(196,153,58,0.2)', padding: '1rem', color: 'white', outline: 'none' }} required />
+                    </div>
+                  )}
                   {activeTab !== 'mindshares' && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', gridColumn: '1 / -1' }}>
                       <label style={{ fontSize: '0.65rem', color: '#C4993A', letterSpacing: '0.2em' }}>LIEN GOOGLE MEET (PRINCIPAL)</label>

@@ -1,4 +1,7 @@
 import { NextResponse } from 'next/server';
+import cloudinary from '@/lib/cloudinary';
+
+export const runtime = 'nodejs';
 
 export async function POST(request: Request) {
   try {
@@ -9,32 +12,37 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
 
-    // Validate file type
     if (!file.type.startsWith('image/')) {
       return NextResponse.json({ error: 'Only image files are allowed' }, { status: 400 });
     }
 
-    // Validate file size (max 5MB)
-    const MAX_SIZE = 5 * 1024 * 1024;
+    const MAX_SIZE = 10 * 1024 * 1024;
     if (file.size > MAX_SIZE) {
-      return NextResponse.json({ error: 'File too large. Maximum size is 5MB.' }, { status: 400 });
+      return NextResponse.json({ error: 'File too large. Maximum size is 10MB.' }, { status: 400 });
     }
 
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Convert to base64 data URL — persists in DB across Render deploys
-    const base64 = buffer.toString('base64');
-    const mimeType = file.type || 'image/png';
-    const dataUrl = `data:${mimeType};base64,${base64}`;
-
-    return NextResponse.json({ 
-      success: true, 
-      filename: file.name,
-      url: dataUrl 
+    const result: any = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder: 'dental-fairies', resource_type: 'image' },
+        (error, uploaded) => (error ? reject(error) : resolve(uploaded))
+      );
+      stream.end(buffer);
     });
-  } catch (error) {
+
+    return NextResponse.json({
+      success: true,
+      filename: file.name,
+      url: result.secure_url,
+      publicId: result.public_id,
+    });
+  } catch (error: any) {
     console.error('Upload error:', error);
-    return NextResponse.json({ error: 'Failed to upload file' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to upload file', details: error?.message || String(error) },
+      { status: 500 }
+    );
   }
 }

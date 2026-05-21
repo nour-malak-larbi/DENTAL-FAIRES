@@ -1,6 +1,4 @@
 import { NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
 
 export async function POST(request: Request) {
   try {
@@ -11,27 +9,29 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
 
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      return NextResponse.json({ error: 'Only image files are allowed' }, { status: 400 });
+    }
+
+    // Validate file size (max 5MB)
+    const MAX_SIZE = 5 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+      return NextResponse.json({ error: 'File too large. Maximum size is 5MB.' }, { status: 400 });
+    }
+
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Save to public/uploads
-    const uploadDir = join(process.cwd(), 'public', 'uploads');
-    
-    // Ensure directory exists
-    try {
-      await mkdir(uploadDir, { recursive: true });
-    } catch (e) {
-      // Ignore if exists
-    }
-
-    const filename = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
-    const path = join(uploadDir, filename);
-    await writeFile(path, buffer);
+    // Convert to base64 data URL — persists in DB across Render deploys
+    const base64 = buffer.toString('base64');
+    const mimeType = file.type || 'image/png';
+    const dataUrl = `data:${mimeType};base64,${base64}`;
 
     return NextResponse.json({ 
       success: true, 
-      filename: filename,
-      url: `/uploads/${filename}` 
+      filename: file.name,
+      url: dataUrl 
     });
   } catch (error) {
     console.error('Upload error:', error);

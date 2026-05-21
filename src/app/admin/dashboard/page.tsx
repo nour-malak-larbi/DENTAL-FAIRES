@@ -7,12 +7,21 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const [items, setItems] = useState({
+  const [items, setItems] = useState<{
+    webinaires: any[];
+    workshops: any[];
+    mindshares: any[];
+    vip: any[];
+    products: any[];
+    purchases: any[];
+    settings: { ccp: string; rip: string };
+  }>({
     webinaires: [],
     workshops: [],
     mindshares: [],
     vip: [],
     products: [],
+    purchases: [],
     settings: { ccp: '', rip: '' },
   });
 
@@ -24,13 +33,17 @@ export default function AdminDashboard() {
   const fetchItems = async () => {
     setLoading(true);
     try {
-      const [webinarsRes, workshopsRes, mindsharesRes, vipRes, productsRes, settingsRes] = await Promise.all([
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const authHeaders: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
+
+      const [webinarsRes, workshopsRes, mindsharesRes, vipRes, productsRes, settingsRes, purchasesRes] = await Promise.all([
         fetch('/api/webinars'),
         fetch('/api/workshops'),
         fetch('/api/mindshares'),
         fetch('/api/vip-offers'),
         fetch('/api/products'),
-        fetch('/api/settings')
+        fetch('/api/settings'),
+        fetch('/api/admin/purchases', { headers: authHeaders }),
       ]);
 
       const webinars = webinarsRes.ok ? await webinarsRes.json().catch(() => []) : [];
@@ -39,6 +52,7 @@ export default function AdminDashboard() {
       const vip = vipRes.ok ? await vipRes.json().catch(() => []) : [];
       const products = productsRes.ok ? await productsRes.json().catch(() => []) : [];
       const settings = settingsRes.ok ? await settingsRes.json().catch(() => ({ ccp: '', rip: '' })) : { ccp: '', rip: '' };
+      const purchases = purchasesRes.ok ? await purchasesRes.json().catch(() => []) : [];
 
       setItems({
         webinaires: Array.isArray(webinars) ? webinars : [],
@@ -46,12 +60,33 @@ export default function AdminDashboard() {
         mindshares: Array.isArray(mindshares) ? mindshares : [],
         vip: Array.isArray(vip) ? vip : [],
         products: Array.isArray(products) ? products : [],
+        purchases: Array.isArray(purchases) ? purchases : [],
         settings: (settings && !settings.error) ? settings : { ccp: '', rip: '' },
       });
     } catch (error) {
       console.error('Failed to fetch items:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const updatePurchaseStatus = async (id: string, status: 'paid' | 'rejected' | 'pending') => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    if (!token) { alert('Session expirée. Reconnectez-vous.'); return; }
+    try {
+      const res = await fetch('/api/admin/purchases', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ id, status }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        alert(`Échec mise à jour (${res.status}): ${err.error || 'inconnu'}`);
+        return;
+      }
+      await fetchItems();
+    } catch (e: any) {
+      alert(`Erreur réseau: ${e?.message || e}`);
     }
   };
 
@@ -71,6 +106,7 @@ export default function AdminDashboard() {
     { id: 'workshops', label: 'Workshops', icon: '🛠' },
     { id: 'vip', label: 'Coaching VIP', icon: '💎' },
     { id: 'products', label: 'Comptoir Dentaire', icon: '🛒' },
+    { id: 'purchases', label: 'Reçus / Paiements', icon: '💳' },
     { id: 'settings', label: 'Paramètres', icon: '⚙' },
   ];
 
@@ -274,7 +310,7 @@ export default function AdminDashboard() {
             </h1>
             <div style={{ width: '60px', height: '2px', background: '#C4993A', marginTop: '1rem' }}></div>
           </div>
-          {!editingItem && activeTab !== 'overview' && activeTab !== 'settings' && (
+          {!editingItem && activeTab !== 'overview' && activeTab !== 'settings' && activeTab !== 'purchases' && (
             <button onClick={handleCreate} style={{
               background: 'linear-gradient(135deg, #C4993A, #8B6820)', color: 'white', border: 'none', padding: '0.8rem 2rem',
               fontSize: '0.7rem', letterSpacing: '0.2em', textTransform: 'uppercase', cursor: 'pointer', fontWeight: 500,
@@ -439,6 +475,76 @@ export default function AdminDashboard() {
                     <p style={{ fontSize: '3.5rem', color: 'white', margin: 0, fontFamily: "'Cormorant Garamond', serif" }}>{stat.count}</p>
                   </div>
                 ))}
+              </div>
+            ) : activeTab === 'purchases' ? (
+              <div>
+                {items.purchases.length === 0 ? (
+                  <div style={{ padding: '4rem', textAlign: 'center', color: 'rgba(255,255,255,0.3)', fontSize: '0.85rem', letterSpacing: '0.1em' }}>
+                    Aucun reçu reçu pour le moment.
+                  </div>
+                ) : (
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ background: 'rgba(196,153,58,0.08)', textAlign: 'left' }}>
+                        <th style={{ padding: '1.2rem 1.5rem', color: '#C4993A', fontSize: '0.65rem', letterSpacing: '0.2em', textTransform: 'uppercase' }}>Date</th>
+                        <th style={{ padding: '1.2rem 1.5rem', color: '#C4993A', fontSize: '0.65rem', letterSpacing: '0.2em', textTransform: 'uppercase' }}>Utilisateur</th>
+                        <th style={{ padding: '1.2rem 1.5rem', color: '#C4993A', fontSize: '0.65rem', letterSpacing: '0.2em', textTransform: 'uppercase' }}>Produit</th>
+                        <th style={{ padding: '1.2rem 1.5rem', color: '#C4993A', fontSize: '0.65rem', letterSpacing: '0.2em', textTransform: 'uppercase' }}>Montant</th>
+                        <th style={{ padding: '1.2rem 1.5rem', color: '#C4993A', fontSize: '0.65rem', letterSpacing: '0.2em', textTransform: 'uppercase' }}>Reçu</th>
+                        <th style={{ padding: '1.2rem 1.5rem', color: '#C4993A', fontSize: '0.65rem', letterSpacing: '0.2em', textTransform: 'uppercase' }}>Statut</th>
+                        <th style={{ padding: '1.2rem 1.5rem', color: '#C4993A', fontSize: '0.65rem', letterSpacing: '0.2em', textTransform: 'uppercase', textAlign: 'right' }}>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {items.purchases.map((p: any) => {
+                        const statusColors: Record<string, string> = { pending: '#C4993A', paid: '#7A9E7A', rejected: '#FF6464' };
+                        const color = statusColors[p.status] || '#888';
+                        return (
+                          <tr key={p.id} style={{ borderBottom: '1px solid rgba(196,153,58,0.05)' }}>
+                            <td style={{ padding: '1.2rem 1.5rem', color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem' }}>
+                              {new Date(p.createdAt).toLocaleDateString('fr-FR')}
+                            </td>
+                            <td style={{ padding: '1.2rem 1.5rem', color: 'white', fontSize: '0.8rem' }}>
+                              <div>{p.user?.name || '—'}</div>
+                              <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.7rem' }}>{p.user?.email || ''}</div>
+                            </td>
+                            <td style={{ padding: '1.2rem 1.5rem', color: 'rgba(255,255,255,0.7)', fontSize: '0.8rem' }}>
+                              <div>{p.productType}</div>
+                              <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.65rem' }}>{p.productId}</div>
+                            </td>
+                            <td style={{ padding: '1.2rem 1.5rem', color: '#F1D382', fontSize: '0.85rem' }}>{p.amount || '—'}</td>
+                            <td style={{ padding: '1.2rem 1.5rem' }}>
+                              {p.receiptFile ? (
+                                p.receiptFile.startsWith('http') ? (
+                                  <a href={p.receiptFile} target="_blank" rel="noopener noreferrer" style={{ color: '#C4993A', fontSize: '0.75rem', textDecoration: 'underline' }}>Voir reçu ↗</a>
+                                ) : (
+                                  <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.7rem' }}>{p.receiptFile}</span>
+                                )
+                              ) : (
+                                <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.7rem' }}>—</span>
+                              )}
+                            </td>
+                            <td style={{ padding: '1.2rem 1.5rem' }}>
+                              <span style={{ background: `${color}22`, color, padding: '0.3rem 0.8rem', fontSize: '0.65rem', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600 }}>
+                                {p.status}
+                              </span>
+                            </td>
+                            <td style={{ padding: '1.2rem 1.5rem', textAlign: 'right' }}>
+                              {p.status === 'pending' ? (
+                                <>
+                                  <button onClick={() => updatePurchaseStatus(p.id, 'paid')} style={{ background: 'transparent', border: '1px solid #7A9E7A', color: '#7A9E7A', padding: '0.4rem 1rem', fontSize: '0.65rem', marginRight: '0.5rem', cursor: 'pointer', letterSpacing: '0.1em' }}>Approuver</button>
+                                  <button onClick={() => updatePurchaseStatus(p.id, 'rejected')} style={{ background: 'transparent', border: '1px solid #FF6464', color: '#FF6464', padding: '0.4rem 1rem', fontSize: '0.65rem', cursor: 'pointer', letterSpacing: '0.1em' }}>Refuser</button>
+                                </>
+                              ) : (
+                                <button onClick={() => updatePurchaseStatus(p.id, 'pending')} style={{ background: 'transparent', border: '1px solid rgba(196,153,58,0.3)', color: '#C4993A', padding: '0.4rem 1rem', fontSize: '0.65rem', cursor: 'pointer', letterSpacing: '0.1em' }}>Rouvrir</button>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                )}
               </div>
             ) : activeTab === 'settings' ? (
               <div style={{ padding: '4rem' }}>

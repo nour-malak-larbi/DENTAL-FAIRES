@@ -12,6 +12,17 @@ const ALL_CATEGORIES = [
 
 import Navbar from '@/components/Navbar';
 
+const getMindshareImage = (image?: string | null) => {
+  if (!image) return '/logo-transparent.png';
+  if (image.startsWith('/') || image.startsWith('http://') || image.startsWith('https://') || image.startsWith('data:')) {
+    return image;
+  }
+  if (/^\d+-/.test(image)) {
+    return `/uploads/${image}`;
+  }
+  return `/mindshares/${image}`;
+};
+
 export default function MindsharesPage() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeCategory, setActiveCategory] = useState('all');
@@ -146,7 +157,7 @@ export default function MindsharesPage() {
                   {/* Poster Image Container */}
                   <div style={{ position: 'relative', aspectRatio: '16/9', overflow: 'hidden', background: '#000' }}>
                     <img 
-                      src={mindshare.image || mindshare.posterFile || '/logo-transparent.png'}
+                      src={getMindshareImage(mindshare.image || mindshare.posterFile)}
                       alt={mindshare.title}
                       style={{
                         width: '100%', height: '100%', objectFit: 'contain',

@@ -5,6 +5,17 @@ import { useRouter } from 'next/navigation';
 
 import Navbar from '@/components/Navbar';
 
+const getWebinarImage = (posterFile?: string | null) => {
+  if (!posterFile) return '/logo-transparent.png';
+  if (posterFile.startsWith('/') || posterFile.startsWith('http://') || posterFile.startsWith('https://') || posterFile.startsWith('data:')) {
+    return posterFile;
+  }
+  if (/^\d+-/.test(posterFile)) {
+    return `/uploads/${posterFile}`;
+  }
+  return `/webinares/${posterFile}`;
+};
+
 export default function WebinarDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const [hasAccess, setHasAccess] = useState(false);
@@ -138,7 +149,7 @@ export default function WebinarDetailPage({ params }: { params: { id: string } }
               background: '#000', aspectRatio: '16/9'
             }}>
               <img 
-                src={webinar.posterFile || webinar.image || '/logo-transparent.png'}
+                src={getWebinarImage(webinar.posterFile || webinar.image)}
                 alt={webinar.title}
                 onLoad={() => setImgLoaded(true)}
                 style={{ 

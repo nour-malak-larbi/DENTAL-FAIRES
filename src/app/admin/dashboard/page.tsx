@@ -116,7 +116,7 @@ export default function AdminDashboard() {
       if (data.success) {
         setEditingItem({
           ...editingItem,
-          posterFile: data.filename,
+          posterFile: data.url,
           image: data.url
         });
         alert('Fichier téléchargé avec succès');

@@ -6,6 +6,17 @@ import { Workshop } from '@/lib/workshops-data';
 
 import Navbar from '@/components/Navbar';
 
+const getWorkshopImage = (posterFile?: string | null) => {
+  if (!posterFile) return '/logo-transparent.png';
+  if (posterFile.startsWith('/') || posterFile.startsWith('http://') || posterFile.startsWith('https://') || posterFile.startsWith('data:')) {
+    return posterFile;
+  }
+  if (/^\d+-/.test(posterFile)) {
+    return `/uploads/${posterFile}`;
+  }
+  return `/workshops/${posterFile}`;
+};
+
 export default function WorkshopDetailPage({ params }: { params: { id: string } }) {
   const [hasAccess, setHasAccess] = useState(false);
   const [meetLink, setMeetLink] = useState<string | null>(null);
@@ -173,7 +184,7 @@ export default function WorkshopDetailPage({ params }: { params: { id: string } 
                 background: '#0D140D', aspectRatio: '1/1'
               }}>
                 <img 
-                  src={workshop.posterFile || workshop.image || '/logo-transparent.png'}
+                  src={getWorkshopImage(workshop.posterFile || workshop.image)}
                   alt={workshop.title}
                   onLoad={() => setImgLoaded(true)}
                   style={{ 

@@ -5,6 +5,17 @@ import Link from 'next/link';
 
 import Navbar from '@/components/Navbar';
 
+const getMindshareImage = (image?: string | null) => {
+  if (!image) return '/logo-transparent.png';
+  if (image.startsWith('/') || image.startsWith('http://') || image.startsWith('https://') || image.startsWith('data:')) {
+    return image;
+  }
+  if (/^\d+-/.test(image)) {
+    return `/uploads/${image}`;
+  }
+  return `/mindshares/${image}`;
+};
+
 export default function MindshareDetailPage({ params }: { params: { id: string } }) {
   const [hasAccess, setHasAccess] = useState(false);
   const [meetLink, setMeetLink] = useState<string | null>(null);
@@ -120,7 +131,7 @@ export default function MindshareDetailPage({ params }: { params: { id: string }
         {/* Left: Sticky Poster */}
         <div style={{ flex: '1', minWidth: '320px', position: 'relative', height: 'clamp(300px, 50vh, 100vh)', overflow: 'hidden' }}>
           <img 
-            src={mindshare.posterFile || mindshare.image || '/logo-transparent.png'}
+            src={getMindshareImage(mindshare.posterFile || mindshare.image)}
             alt={mindshare.title}
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />

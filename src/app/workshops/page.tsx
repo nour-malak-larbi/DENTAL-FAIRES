@@ -4,6 +4,17 @@ import Link from 'next/link';
 
 import Navbar from '@/components/Navbar';
 
+const getWorkshopImage = (posterFile?: string | null) => {
+  if (!posterFile) return '/logo-transparent.png';
+  if (posterFile.startsWith('/') || posterFile.startsWith('http://') || posterFile.startsWith('https://') || posterFile.startsWith('data:')) {
+    return posterFile;
+  }
+  if (/^\d+-/.test(posterFile)) {
+    return `/uploads/${posterFile}`;
+  }
+  return `/workshops/${posterFile}`;
+};
+
 export default function WorkshopsPage() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
@@ -116,7 +127,7 @@ export default function WorkshopsPage() {
                   {/* Poster Image Container - "Full" fit */}
                   <div style={{ position: 'relative', aspectRatio: '1/1', overflow: 'hidden', background: '#000' }}>
                     <img 
-                      src={workshop.posterFile || workshop.image || '/logo-transparent.png'}
+                      src={getWorkshopImage(workshop.posterFile || workshop.image)}
                       alt={workshop.title}
                       style={{
                         width: '100%', height: '100%', objectFit: 'contain',

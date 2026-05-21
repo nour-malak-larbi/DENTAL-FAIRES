@@ -12,6 +12,17 @@ const ALL_CATEGORIES = [
 
 import Navbar from '@/components/Navbar';
 
+const getWebinarImage = (posterFile?: string | null) => {
+  if (!posterFile) return '/logo-transparent.png';
+  if (posterFile.startsWith('/') || posterFile.startsWith('http://') || posterFile.startsWith('https://') || posterFile.startsWith('data:')) {
+    return posterFile;
+  }
+  if (/^\d+-/.test(posterFile)) {
+    return `/uploads/${posterFile}`;
+  }
+  return `/webinares/${posterFile}`;
+};
+
 export default function WebinairesPage() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeCategory, setActiveCategory] = useState('all');
@@ -155,7 +166,7 @@ export default function WebinairesPage() {
                   {/* Poster Image Container - Ratio updated for "full" posters */}
                   <div style={{ position: 'relative', aspectRatio: '1/1', overflow: 'hidden', background: '#000' }}>
                     <img 
-                      src={webinar.posterFile || webinar.image || '/logo-transparent.png'}
+                      src={getWebinarImage(webinar.posterFile || webinar.image)}
                       alt={webinar.title}
                       style={{
                         width: '100%', height: '100%', objectFit: 'cover',

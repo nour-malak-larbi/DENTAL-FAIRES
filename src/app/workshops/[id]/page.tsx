@@ -107,23 +107,30 @@ export default function WorkshopDetailPage({ params }: { params: { id: string } 
     paymentData.append('productType', 'workshop');
     paymentData.append('productId', workshop.id);
 
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    if (!token) {
+      alert('Veuillez vous connecter avant d\'envoyer votre reçu.');
+      return;
+    }
+
     try {
       const response = await fetch('/api/confirm-payment', {
         method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
         body: paymentData
       });
 
       if (response.ok) {
         alert('Reçu envoyé ! Notre équipe validera votre accès sous 24h.');
         setPurchased(false);
-        // Refresh access status
         window.location.reload();
       } else {
-        alert('Erreur lors de l\'envoi du reçu. Veuillez réessayer.');
+        const errData = await response.json().catch(() => ({}));
+        alert(`Erreur (${response.status}): ${errData.error || 'Envoi du reçu impossible. Veuillez réessayer.'}`);
       }
     } catch (error) {
       console.error('Payment submission error:', error);
-      alert('Erreur lors de l\'envoi du reçu. Veuillez réessayer.');
+      alert('Erreur réseau. Veuillez réessayer.');
     }
   };
 

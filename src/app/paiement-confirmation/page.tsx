@@ -45,8 +45,16 @@ function PaymentConfirmationContent() {
       formData.append('productId', productId || 'Inconnu');
       formData.append('file', file);
 
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      if (!token) {
+        alert('Veuillez vous connecter avant d\'envoyer votre reçu.');
+        setUploading(false);
+        return;
+      }
+
       const res = await fetch('/api/confirm-payment', {
         method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
         body: formData,
       });
 
